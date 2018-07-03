@@ -1,0 +1,22 @@
+{
+    "mysql": {
+        "host": "localhost",
+        "port": "3306",
+        "user": "root",
+        "password": "123456"
+    },
+    "dbTables": {
+        "record": "loseweight.record",
+        "user": "loseweight.wx_user"
+    },
+    "host": {
+        "hostname": "localhost",
+        "port": null,
+        "agent": false
+    },
+    "version": "v1.0.0",
+    "wxConfig":{
+        "AppID":"wx6d24721866d8e9b5",
+        "AppSecret":"6a60cd8dd8f370ad57d3e26a8b6fe5bf"
+    }
+}
