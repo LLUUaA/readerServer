@@ -21,6 +21,15 @@ router.get('/home/get',async (ctx,next)=>{
     ctx.body = result
 })
 
+router.get('/book/search',async (ctx,next)=>{
+    const { searchBook } = require('./utils/spider');
+    var result;
+    await searchBook('99').then(res => {
+            result = res;
+        })
+    ctx.body = result
+})
+
 
 app.use(router.routes()).use(router.allowedMethods());
 app.listen(3000);

@@ -18,7 +18,7 @@ function getHome() {
                 var hotBook,subMenu,maleMenu,femaleMenu;
                 const selector = {
                     // todayHot: `.free_book_list .lists li@list {a[href=$href];}`,
-                    todayHot: `.free_book_list .lists li@hotBook {a[href=$href];img[src=$coverImg];h3{$name}}`,
+                    todayHot: `.free_book_list .lists li@hotBook {a[href=$href];img[data-original=$coverImg];p{$description};h3{$name}}`,
                     subMenu: `.subMenuCon .subMenu li@subMenu {li a[href=$href] {$subTxt};}`,
                     maleMenu: `.subMenuCon .subMenus .male li@maleMenu {a[href=$href] {$subTxt};}`,
                     femaleMenu: `.subMenuCon .subMenus .female li@femaleMenu {a[href=$href] {$subTxt};}`
@@ -36,6 +36,31 @@ function getHome() {
     })
 }
 
+function search(keyword) {
+    return new Promise((resolve, reject) => {
+        request({
+            hostname: spider.baseUrl,
+            path: `/search.html?searchkey=${keyword}&searchtype=all`,
+            port: 443,
+            data: {
+                "searchkey": keyword,
+                "searchtype": "all"
+            }
+        }).then(res => {
+            var result;
+            const html = res;
+            const selector = {
+                searchBook:`#waterfall div@searchBook {.title{$content};}`
+            }
+            result = temme(html,selector.searchBook);
+            resolve(result);
+        }, err => {
+            reject(err);
+        })
+    })
+}
+
 module.exports = {
-    getHome
+    getHome,
+    searchBook:search
 }

@@ -15,13 +15,24 @@ module.exports = {
     request(opt, isHttps = true) {
         return new Promise((resolve, reject) => {
             const reqHttp = isHttps ? HTTPS : HTTP;
-            const options = Object.assign({
+
+            const postData = JSON.stringify(opt.data || {});
+
+            var options = Object.assign({
                 hostname: host.hostname,
                 method: 'GET',
                 path: opt.url || opt.path,
                 port: host.port,
+                headers: {
+                    "Content-Type": 'application/json',
+                    "Content-Length": postData.length
+                },        
                 agent: false
             }, opt)
+            
+            // if( options.method==="get" || options.method==="GET") {
+            //     options.path = 
+            // }
 
             // console.log('options',options);
             const req = reqHttp.request(options, (res) => {
@@ -49,7 +60,7 @@ module.exports = {
                     // process.stdout.write('req end');
                 });
             });
-
+            req.write(postData);
             req.on('error', (e) => {
                 reject(e);
                 console.error(e);
