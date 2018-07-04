@@ -15,6 +15,9 @@
         "agent": false
     },
     "version": "v1.0.0",
+    "spider":{
+        "baseUrl":"www.xiashu.la"
+    },
     "wxConfig":{
         "AppID":"wx6d24721866d8e9b5",
         "AppSecret":"6a60cd8dd8f370ad57d3e26a8b6fe5bf"

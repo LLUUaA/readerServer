@@ -1,0 +1,30 @@
+{
+	"name": "reader",
+	"version": "0.0.1",
+	"author": "WQS",
+	"main": "app",
+	"description": "reader",
+	"keywords": [
+		"node.js",
+		"javascript"
+	],
+	"repository": {},
+	"license": "MIT",
+	"engines": {
+		"node": ">=7.8.0"
+	},
+	"scripts": {
+		"start": "node index.js",
+		"dev": "nodemon main"
+	},
+	"dependencies": {
+		"koa": "^2.5.1",
+		"koa-router": "^7.4.0",
+		"temme": "^0.7.0"
+	},
+	"devDependencies": {
+		"koa": "^2.5.1",
+		"koa-router": "^7.4.0",
+		"temme": "^0.7.0"
+	}
+}

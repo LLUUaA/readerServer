@@ -32,6 +32,7 @@ module.exports = {
                     result,
                     size = 0;
                 res.on('data', (data) => {
+                    // console.log('data', data);
                     if (!isBuffer && Buffer.isBuffer(data)) {
                         isBuffer = true;
                     }
@@ -45,6 +46,7 @@ module.exports = {
                     // var result = buff.toString();
                     result = isBuffer ? buff.toString() : buff;
                     resolve(result);
+                    // process.stdout.write('req end');
                 });
             });
 
@@ -56,17 +58,10 @@ module.exports = {
         })
     },
 
-    getHtml(opt, isHttps = true) {
-        const options = Object.assign({
-            hostname: host.hostname,
-            path: opt.url || opt.path,
-            port: host.port,
-            agent: false
-        }, opt)
-
+    getHtml(url) {
         const reqHttp = isHttps ? HTTPS : HTTP;
         var buff = "", isBuffer = false, result;
-        reqHttp.get(options, function (res) {
+        reqHttp.get(url, function (res) {
             res.on('data', function (data) {
                 if (!isBuffer && Buffer.isBuffer(data)) {
                     isBuffer = true;
