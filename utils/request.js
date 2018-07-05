@@ -58,13 +58,15 @@ module.exports = {
                     result = isBuffer ? buff.toString() : buff;
                     resolve(result);
                     // process.stdout.write('req end');
+
                 });
             });
-            req.write(postData);
             req.on('error', (e) => {
+                req.destroy();
                 reject(e);
-                console.error(e);
             });
+
+            req.write(postData);
             req.end();
         })
     },
