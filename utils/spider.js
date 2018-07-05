@@ -73,7 +73,7 @@ function search(keyword, pageIndex = 1,path) {
             var result, pager = {};
             const html = res;
             const selector = {
-                searchBook: `#waterfall div.item@ {.pic a[href=$href];.pic img[data-original=$coverImg]; .title h3{$content};.nickname{$nickname};.intro{$intro}}`,
+                searchBook: `#waterfall div.item@ {.pic a[href=$href];.pic img[data-original=$coverImg]; .title h3{$name};.nickname{$nickname};.intro{$description}}`,
                 pageIndex: `.footer a@|filterData {&a[class="current"] {$pageIndex};}`,
                 pageContent: `.footer span{$pageContent};`,
             }
