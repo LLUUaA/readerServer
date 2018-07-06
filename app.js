@@ -21,37 +21,45 @@ router.get('/book/home',async (ctx,next)=>{
     ctx.body = result
 })
 
-router.get('/book/search',async (ctx,next)=>{
+router.get('/book/search/:keyword',async (ctx,next)=>{
     const { searchBook } = require('./utils/spider');
     var result;
-    await searchBook('99',4).then(res => {
+    
+    if(ctx.params.keyword.length>1) {
+        await searchBook(ctx.params.keyword,ctx.query.pageIndex).then(res => {
             result = res;
         })
+    }else{
+        result = 'keyword not null'
+    }
+
     ctx.body = result
 })
 
-router.get('/book/chapter',async (ctx,next)=>{
+router.get('/book/chapter/:bookId',async (ctx,next)=>{
     const { getChapter } = require('./utils/spider');
     var result;
-    await getChapter(5596).then(res => {
+    await getChapter(ctx.params.bookId).then(res => {
             result = res;
         })
     ctx.body = result
 })
 
-router.get('/book/chapter/other',async (ctx,next)=>{
+router.get('/book/chapter/other/:bookId/:otherNum',async (ctx,next)=>{
     const { getOtherChapter } = require('./utils/spider');
     var result;
-    await getOtherChapter(5596,485).then(res => {
+    const {bookId,otherNum} = ctx.params;
+    await getOtherChapter(bookId,otherNum).then(res => {
             result = res;
         })
     ctx.body = result
 })
 
-router.get('/book/chapter/details',async (ctx,next)=>{
+router.get('/book/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
     const { getChapterDetails } = require('./utils/spider');
     var result;
-    await getChapterDetails(5596,1).then(res => {
+    const {bookId,chapterNum } = ctx.params;
+    await getChapterDetails(bookId,chapterNum).then(res => {
             result = res;
         })
     ctx.body = result

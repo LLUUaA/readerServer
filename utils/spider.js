@@ -125,7 +125,7 @@ function getChapter(bookId) {
  * 
  */
 
-function getOtherChapter(bookId, otherNum) {
+function getOtherChapter(bookId, otherNum=50) {
     return new Promise((resolve, reject) => {
         request({
             hostname: spider.baseUrl,
