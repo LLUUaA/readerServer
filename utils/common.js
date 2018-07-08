@@ -115,4 +115,5 @@ module.exports = {
         route[route.length-1] = route[route.length-1].split('?')[0];
         return route;
     }
+
 }

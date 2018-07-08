@@ -1,5 +1,5 @@
 /**
- * 响应处理模块
+ * 跨域处理模块
  */
 module.exports = async function (ctx, next) {
     try {
@@ -8,7 +8,10 @@ module.exports = async function (ctx, next) {
          * @return {Boolean} 
          */
         const getCrosStatus = (url) => {
-            const urlList = ['http://localhost:8080'];
+            const urlList = [
+                'http://localhost:8080',
+                'http://192.168.66.100:8080'
+            ];
             return urlList.indexOf(url) >= 0 ? true : false;
         }
 

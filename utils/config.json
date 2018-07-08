@@ -16,7 +16,8 @@
     },
     "version": "v1.0.0",
     "spider":{
-        "baseUrl":"www.xiashu.la"
+        "baseUrl":"www.xiashu.la",
+        "mobileBaseUrl":"m.xiashu.la"
     },
     "wxConfig":{
         "AppID":"wx6d24721866d8e9b5",
