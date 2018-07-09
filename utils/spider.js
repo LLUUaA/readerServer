@@ -181,7 +181,7 @@ function getOtherChapter(bookId, pageIndex = 1) {
             const html = res;
             const selector = {
                 chapter:`.content .cataloglist li@ {a[href=$chapterNum|getChapter];span{$chapterName}}`,
-                chapterPager:`.content .pagers #select #pagelist option@ {&{$}}`,
+                chapterPager:`.content .pagers:first-of-type #select #pagelist option@ {&{$}}`
             }
             result = temme(html, selector.chapter);
             chapterPager = temme(html, selector.chapterPager);
