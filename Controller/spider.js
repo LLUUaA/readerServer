@@ -162,7 +162,7 @@ function getChapter(bookId,onlyChapterInfo = false) {
             bookInfo.bookIntro = temme(html, selector.bookIntro);
             bookInfo.bookAuthor = temme(html, selector.bookAuthor);
             bookInfo.bookName = temme(html, selector.bookName);
-            bookIntro = bookIntro.replace('[+展开]','');
+            bookInfo.bookIntro = bookInfo.bookIntro.replace('[+展开]','');
             if (onlyChapterInfo) {
                 resolve(bookInfo);
             } else {
