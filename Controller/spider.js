@@ -163,8 +163,10 @@ function getChapter(bookId,onlyChapterInfo = false) {
             bookInfo.bookAuthor = temme(html, selector.bookAuthor);
             bookInfo.bookName = temme(html, selector.bookName);
             bookInfo.bookIntro = bookInfo.bookIntro.replace('[+展开]','');
+            bookInfo.bookId = bookId;
+
             if (onlyChapterInfo) {
-                resolve(bookInfo);
+                resolve({bookInfo});
             } else {
                 result.top = temme(html, selector.chapterTop);
                 result.last = temme(html, selector.chapterLast);
