@@ -2,6 +2,8 @@
 const { host } = require('./config.json');
 const HTTP = require('http');
 const HTTPS = require('https');
+const logger = require('../lib/logger');
+
 /**
  * @description hostname不能带协议(http|https) 自带http、https请求，否则报错。
  *              如果是string eg:https://wwww.google.com 则可以带协议
@@ -63,6 +65,7 @@ module.exports = {
             });
             req.on('error', (e) => {
                 req.destroy();
+                logger(e);
                 reject(e);
             });
 
