@@ -135,28 +135,42 @@ function search(keyword, pageIndex = 1,path) {
 
 /**
  * @function getchapter
- * @param {bookId} bookId
+ * @param {number} bookId
+ * @param {boolean} onlyChapterInfo
  * @description 获取章节
+ * @returns Promise
  */
 
-function getChapter(bookId) {
+function getChapter(bookId,onlyChapterInfo = false) {
     return new Promise((resolve, reject) => {
         request({
             hostname: spider.baseUrl,
             path: `/${bookId}/`,
             port: 443
         }).then(res => {
-            var result = {}, otherNum; //otherNum 中间隐藏章节数量
+            var result = {}, otherNum,bookInfo = {} ; //otherNum 中间隐藏章节数量
             const html = res;
             const selector = {
                 chapterTop: `#main #mainleft #detaillist #toplist li@ {a[href=$chapterNum|getChapter] {$chapterName}; .time{$time}}`,
                 chapterLast: `#main #mainleft #detaillist #lastchapter li@ {a[href=$chapterNum|getChapter] {$chapterName};.time{$time}}`,
-                otherNum: `#main #mainleft #detaillist #hidc .ycnum{$}`
+                otherNum: `#main #mainleft #detaillist #hidc .ycnum{$}`,
+                bookIntro:`#main #bookdetail #info #aboutbook{$}`,
+                bookAuthor:`#main #bookdetail #infobox .ainfo .username a{$}`,
+                bookName:`#main #bookdetail #info .infotitle h1{$}`
             }
-            result.top = temme(html, selector.chapterTop);
-            result.last = temme(html, selector.chapterLast);
-            otherNum = temme(html, selector.otherNum);
-            resolve({ result, otherNum });
+
+            bookInfo.bookIntro = temme(html, selector.bookIntro);
+            bookInfo.bookAuthor = temme(html, selector.bookAuthor);
+            bookInfo.bookName = temme(html, selector.bookName);
+            bookIntro = bookIntro.replace('[+展开]','');
+            if (onlyChapterInfo) {
+                resolve(bookInfo);
+            } else {
+                result.top = temme(html, selector.chapterTop);
+                result.last = temme(html, selector.chapterLast);
+                otherNum = temme(html, selector.otherNum);
+                resolve({ result, otherNum, bookInfo });
+            }
         }, err => {
             reject(err)
         })
