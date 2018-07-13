@@ -1,4 +1,5 @@
 const temme = require('temme').default; //or import temme from 'temme'
+const logger = require('../lib/logger');
 const { defineFilter } = require('temme');
 const { getHtml, request } = require('../utils/request');
 const { spider } = require('../utils/config.json');
@@ -162,7 +163,7 @@ function getChapter(bookId,onlyChapterInfo = false) {
             bookInfo.bookIntro = temme(html, selector.bookIntro);
             bookInfo.bookAuthor = temme(html, selector.bookAuthor);
             bookInfo.bookName = temme(html, selector.bookName);
-            bookInfo.bookIntro = bookInfo.bookIntro.replace('[+展开]','');
+            bookInfo.bookIntro = bookInfo.bookIntro?bookInfo.bookIntro.replace('[+展开]',''):'暂无简介';
             bookInfo.bookId = bookId;
 
             if (onlyChapterInfo) {
@@ -174,6 +175,7 @@ function getChapter(bookId,onlyChapterInfo = false) {
                 resolve({ result, otherNum, bookInfo });
             }
         }, err => {
+            logger(err)
             reject(err)
         })
     })
@@ -244,6 +246,7 @@ function getChapterDetails(bookId,chapterNum=1) {
             chapterName = temme(html, selector.chapterName);
             resolve({chapterName,chapterContent});
         },err=>{
+            logger(err);
             reject(err);
         })
     })
