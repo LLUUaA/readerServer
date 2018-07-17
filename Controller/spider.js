@@ -157,12 +157,18 @@ function getChapter(bookId,onlyChapterInfo = false) {
                 otherNum: `#main #mainleft #detaillist #hidc .ycnum{$}`,
                 bookIntro:`#main #bookdetail #info #aboutbook{$}`,
                 bookAuthor:`#main #bookdetail #infobox .ainfo .username a{$}`,
-                bookName:`#main #bookdetail #info .infotitle h1{$}`
+                bookName:`#main #bookdetail #info .infotitle h1{$}`,
+                status:`#main #bookdetail #info .infotitle span{$}`,
+                chapter:`#main .infonum ul@ {li{$}}`,
+                coverImg:`#main #bookdetail #picbox .img_in img[data-original=$];`
             }
 
             bookInfo.bookIntro = temme(html, selector.bookIntro);
             bookInfo.bookAuthor = temme(html, selector.bookAuthor);
             bookInfo.bookName = temme(html, selector.bookName);
+            bookInfo.status = temme(html, selector.status);
+            bookInfo.chapter = temme(html, selector.chapter);
+            bookInfo.coverImg = temme(html, selector.coverImg);
             bookInfo.bookIntro = bookInfo.bookIntro?bookInfo.bookIntro.replace('[+展开]',''):'暂无简介';
             bookInfo.bookId = bookId;
 

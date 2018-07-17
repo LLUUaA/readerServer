@@ -38,8 +38,9 @@ router.get('/search/:keyword',async (ctx,next)=>{
  */
 router.get('/chapter/:bookId',async (ctx,next)=>{
     const { getChapter } = require(spiderPath);
+    const { onlyBookInfo }  = ctx.query;
     var result;
-    await getChapter(ctx.params.bookId).then(res => {
+    await getChapter(ctx.params.bookId,!!onlyBookInfo).then(res => {
             result = res;
         })
     ctx.body = result
