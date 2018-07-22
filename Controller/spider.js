@@ -102,6 +102,9 @@ function getHome() {
  * @function search
  * 
  * @description 搜索 path为公用selector (接口处理 eg:nan-> path=/type/nan_0_0_allvisit_1.html )
+ * @description 请注意，encodeURI 自身无法产生能适用于HTTP GET 或 POST 请求的URI，例如对于 XMLHTTPRequests,
+ *              因为 "&", "+", 和 "=" 不会被编码，然而在 GET 和 POST 请求中它们是特殊字符。
+ *              然而encodeURIComponent这个方法会对这些字符编码。
  * 
  * @param { keyword, pageIndex,path } keyword关键字 pageIndex页码 path传入页面path
  */
@@ -109,7 +112,7 @@ function search(keyword, pageIndex = 1,path) {
     return new Promise((resolve, reject) => {
         request({
             hostname: spider.baseUrl,
-            path: `/search.html?searchkey=${keyword}&searchtype=all&page=${pageIndex}`,
+            path: encodeURI(`/search.html?searchkey=${keyword}&searchtype=all&page=${pageIndex}`), //keyword带有中文字符需要encodeURI,不用encodeURIComponent
             port: 443,
             data: {
                 "searchkey": keyword,

@@ -61,8 +61,9 @@ module.exports = {
                     resolve(result);
                     // process.stdout.write('req end');
 
-                });
+                })
             });
+
             req.on('error', (e) => {
                 req.destroy();
                 logger(e);
