@@ -127,7 +127,7 @@ function search(keyword, pageIndex = 1,path) {
                 pageContent: `.footer span{$};`,
             }
             result = temme(html, selector.searchBook);
-            pager.pageIndex = temme(html, selector.pageIndex)[0];
+            pager.pageIndex = parseInt(temme(html, selector.pageIndex)[0]);
             pager.pageContent = temme(html, selector.pageContent);
             resolve({ result, pager });
         }, err => {
