@@ -23,6 +23,8 @@ module.exports = async function (ctx, next) {
              * 跨域解决
              */
             ctx.set('Access-Control-Allow-Origin', origin);
+
+            if(ctx.path== '/api/file') ctx.set('Access-Control-Allow-Headers','Content-Range')//file upload
             // ctx.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT');
             ctx.set('Access-Control-Allow-Methods', 'POST, GET');
             // ctx.set('Access-Control-Max-Age', 1000);
