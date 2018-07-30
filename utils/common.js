@@ -1,4 +1,4 @@
-const word = 'A_1_B_2_C_3_D_4_E_5_F_6_G_7_H_8_I_9_J_0'.split('_');
+
 const crypto = require('crypto');
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -10,13 +10,7 @@ module.exports = {
      * @returns {token} token
      */
     generateToken(len = 20) {
-        let token = '';
-        let md5 = crypto.createHash('md5');
-        for (let i = 0; i < len; i++) {
-            token += word[getRandomInt(0, word.length-1)]
-        }
-        return md5.update(token).digest('hex'); //32 位
-        // return token
+        return crypto.randomBytes(len);
     },
 
     /**
