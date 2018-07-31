@@ -16,6 +16,33 @@ router.get('/home',async (ctx,next)=>{
 })
 
 /**
+ * @description 获取书籍分类 
+ */
+router.get('/type/:type',async (ctx,next)=>{
+    const { getBookType } = require(spiderPath);
+    var result;
+    const { type } = ctx.params;
+    await getBookType(type).then(res => {
+            result = res;
+        })
+    ctx.body = result
+})
+
+/**
+ * @description 获取auhor book 
+ */
+router.get('/author/:author',async (ctx,next)=>{
+    const { getAuthorBook } = require(spiderPath);
+    var result;
+    const { author } = ctx.params;
+    await getAuthorBook(author).then(res => {
+            result = res;
+        })
+    ctx.body = result
+})
+
+
+/**
  * @description 搜索
  */
 router.get('/search/:keyword',async (ctx,next)=>{
@@ -73,5 +100,6 @@ router.get('/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
         })
     ctx.body = result
 })
+
 
 module.exports = router

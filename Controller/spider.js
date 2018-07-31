@@ -53,8 +53,24 @@ defineFilter('getChapter',function(){
     }else{
         return 1
     }
-
 })
+
+/**
+ * @function {getTypePage}
+ * @description 获取分类分页
+ * @returns {Int}
+ */
+function getTypePage(page){
+    const matchStrMobile = '_allvisit_';
+    const str = page;
+    const mIdx = str.indexOf(matchStrMobile);
+    if(mIdx>=0){
+        var pos = parseInt(str.substring(mIdx + matchStrMobile.length,str.length-5)) + 1;
+        return '/type/' + str.substr(0, str.length-6) + pos + str.substring(str.length-5, str.length);
+    }else{
+        return 1
+    }
+}
 
 
 /**
@@ -88,7 +104,11 @@ function getHome() {
                 hotBook = temme(html, selector.todayHot);
                 subMenu = temme(html, selector.subMenu);
                 maleMenu = temme(html, selector.maleMenu);
+                maleMenu.unshift({href:'/type/nan_0_0_allvisit_1.html',subTxt:'全部'});
+
                 femaleMenu = temme(html, selector.femaleMenu);
+                femaleMenu.unshift({href:'/type/nv_0_0_allvisit_1.html',subTxt:'全部'});
+
                 resolve({ hotBook, subMenu, maleMenu, femaleMenu });
             }, err => {
                 reject(err);
@@ -261,10 +281,60 @@ function getChapterDetails(bookId,chapterNum=1) {
     })
 }
 
+/**
+ * 
+ * @param {any} type 分类
+ */
+function getBookType(type) {
+    return new Promise((resolve, reject) => {
+
+        request({
+            hostname: spider.mobileBaseUrl,
+            // path: `/type/${type}_0_0_allvisit_1.html`,
+            path: '/type/' + type,
+            port: 443
+        }).then(res => {
+            const html = res;
+            const selector = {
+                book: `.content .module #ulist li@ {a[href=$bookId|getBookId];img[data-original=$coverImg];p.intro{$description};p.book_title{$name}}`,
+                total: `.content .module  .module-hd span{$}`
+            },
+                bookList = temme(html, selector.book),
+                nextPage = getTypePage(type);
+            total = temme(html, selector.total);
+            resolve({ bookList, total, nextPage });
+        },reject)
+    })
+}
+
+/**
+ * 
+ * @param {any} author 分类
+ */
+function getAuthorBook(author) {
+    return new Promise((resolve, reject) => {
+        request({
+            hostname: spider.mobileBaseUrl,
+            path: `/author/${author}`,
+            port: 443
+        }).then(res => {
+            const html = res;
+            const selector = {
+                book: `.content .module #ulist li@ {a[href=$bookId|getBookId];img[data-original=$coverImg];p.intro{$description};p.book_title{$name}}`
+            },
+            bookList = temme(html, selector.book);
+            resolve(bookList);
+        }, reject)
+    })
+}
+
+
 module.exports = {
     getHome,
     searchBook: search,
     getChapter,
     getOtherChapter,
-    getChapterDetails
+    getChapterDetails,
+    getBookType,
+    getAuthorBook
 }
