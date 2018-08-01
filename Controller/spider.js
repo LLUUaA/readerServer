@@ -110,6 +110,7 @@ function getHome() {
                 femaleMenu.unshift({href:'/type/nv_0_0_allvisit_1.html',subTxt:'全部'});
 
                 resolve({ hotBook, subMenu, maleMenu, femaleMenu });
+                // resolve({ hotBook, subMenu });
             }, err => {
                 reject(err);
                 // throw error(err);
@@ -315,7 +316,7 @@ function getAuthorBook(author) {
     return new Promise((resolve, reject) => {
         request({
             hostname: spider.mobileBaseUrl,
-            path: `/author/${author}`,
+            path: encodeURI(`/author/${author}`),
             port: 443
         }).then(res => {
             const html = res;
