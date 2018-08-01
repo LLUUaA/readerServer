@@ -20,40 +20,8 @@ router.get('/home',async (ctx,next)=>{
  */
 
 router.get('/getConfig', async (ctx, next) => {
-    ctx.body = {
-        tab: {
-            showBookType: true,
-            share: {
-                path: null,
-                title: null,
-                imageUrl: null
-            }
-        },
-
-        index: {
-            share: {
-                path: null,
-                title: null,
-                imageUrl: null
-            }
-        },
-
-        reader: {
-            share: {
-                path: null,
-                title: null,
-                imageUrl: null
-            },
-        },
-
-        bookDetail :{
-            share: {
-                path: null,
-                title: null,
-                imageUrl: null
-            },
-        }
-    }
+    const gConfig =  require('../public/config/gConfig.json');
+    ctx.body = gConfig
 })
 
 /**
