@@ -20,8 +20,9 @@ router.get('/home',async (ctx,next)=>{
  */
 
 router.get('/getConfig', async (ctx, next) => {
-    const gConfig =  require('../public/config/gConfig.json');
-    ctx.body = gConfig
+
+    const { name } =ctx.query;  
+    ctx.body = require(`../public/config/${name || 'gConfig'}.json`);
 })
 
 /**
