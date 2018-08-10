@@ -3,6 +3,7 @@ const logger = require('../lib/logger');
 const { defineFilter } = require('temme');
 const { getHtml, request } = require('../utils/request');
 const { spider } = require('../utils/config.json');
+const fs = require("fs");
 
 /**
  * @function {filterData} 过滤空数据
@@ -82,40 +83,74 @@ function getTypePage(page){
 
 function getHome() {
     return new Promise((resolve, reject) => {
-        request({
-            hostname: spider.baseUrl,
-            port: 443
-        })
-            .then(res => {
-                const html = res;
-                /**
-                 * @description hotBook 热门书籍 subMenu 分类菜单
-                 *              maleMenu 男士分类菜单 femaleMenu 女士分类菜单
-                 * 
-                 */
-                // a .infos img[src=$src]
-                var hotBook, subMenu, maleMenu, femaleMenu;
-                const selector = {
-                    todayHot: `.free_book_list .lists li@ {a[href=$bookId|getBookId];img[data-original=$coverImg];p{$description};h3{$name}}`,
-                    subMenu: `.subMenuCon .subMenu li@ {li a[href=$href] {$subTxt};}`,
-                    maleMenu: `.subMenuCon .subMenus .male li@|filterData {a[href=$href] {$subTxt};}`,
-                    femaleMenu: `.subMenuCon .subMenus .female li@|filterData {a[href=$href] {$subTxt};}`
-                }
-                hotBook = temme(html, selector.todayHot);
-                subMenu = temme(html, selector.subMenu);
-                maleMenu = temme(html, selector.maleMenu);
-                maleMenu.unshift({href:'/type/nan_0_0_allvisit_1.html',subTxt:'全部'});
+        const homeDataPath = `${process.cwd()}/public/data`,
+            homeDataName = 'bookHomeData.txt';
 
-                femaleMenu = temme(html, selector.femaleMenu);
-                femaleMenu.unshift({href:'/type/nv_0_0_allvisit_1.html',subTxt:'全部'});
-
-                resolve({ hotBook, subMenu, maleMenu, femaleMenu });
-                // resolve({ hotBook, subMenu });
-            }, err => {
-                reject(err);
-                // throw error(err);
+        const getData  = function (){
+            return new Promise((resolve,reject)=>{
+                request({
+                    hostname: spider.baseUrl,
+                    port: 443
+                })
+                    .then(res => {
+                        const html = res;
+                        /**
+                         * @description hotBook 热门书籍 subMenu 分类菜单
+                         *              maleMenu 男士分类菜单 femaleMenu 女士分类菜单
+                         * 
+                         */
+                        // a .infos img[src=$src]
+                        var hotBook, subMenu, maleMenu, femaleMenu;
+                        const selector = {
+                            todayHot: `.free_book_list .lists li@ {a[href=$bookId|getBookId];img[data-original=$coverImg];p{$description};h3{$name}}`,
+                            subMenu: `.subMenuCon .subMenu li@ {li a[href=$href] {$subTxt};}`,
+                            maleMenu: `.subMenuCon .subMenus .male li@|filterData {a[href=$href] {$subTxt};}`,
+                            femaleMenu: `.subMenuCon .subMenus .female li@|filterData {a[href=$href] {$subTxt};}`
+                        }
+                        hotBook = temme(html, selector.todayHot);
+                        subMenu = temme(html, selector.subMenu);
+                        maleMenu = temme(html, selector.maleMenu);
+                        maleMenu.unshift({href:'/type/nan_0_0_allvisit_1.html',subTxt:'全部'});
+        
+                        femaleMenu = temme(html, selector.femaleMenu);
+                        femaleMenu.unshift({href:'/type/nv_0_0_allvisit_1.html',subTxt:'全部'});
+                        const data = { hotBook, subMenu, maleMenu, femaleMenu };
+                        resolve(data);
+        
+                        if (!fs.existsSync(homeDataPath)) {
+                            fs.mkdirSync(homeDataPath);
+                        }
+                        fs.writeFile(`${homeDataPath}/${homeDataName}`, JSON.stringify(data),err=>{
+                            if(err) logger(err);
+                        });
+                        // resolve({ hotBook, subMenu });
+                    }, err => {
+                        reject(err);
+                        // throw error(err);
+                    })
             })
-        // getHome('www.xiashu.la');    
+        }
+
+        fs.open(`${homeDataPath}/${homeDataName}`, 'r', (err, fd) => {
+            if (err) {
+                getData().then(resolve,reject);
+                logger(err);
+            } else {
+                const rs = fs.createReadStream('', { fd });
+                rs.on('data', (chunk) => {
+                    if(!chunk || !chunk.length) {
+                        getData().then(resolve,reject);
+                        return;
+                    }
+                    getData();
+                    return resolve(JSON.parse(chunk))
+                })
+
+                rs.on('end', function () {
+
+                });
+            }
+        }) 
     })
 }
 
