@@ -171,7 +171,7 @@ function search(keyword, pageIndex = 1,path) {
             path: encodeURI(`/search.html?searchkey=${keyword}&searchtype=all&page=${pageIndex}`), //keyword带有中文字符需要encodeURI,不用encodeURIComponent
             port: 443,
             data: {
-                "searchkey": keyword,
+                "searchkey": encodeURIComponent(keyword),
                 "searchtype": "all"
             }
         }).then(res => {
