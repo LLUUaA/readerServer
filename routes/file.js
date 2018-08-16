@@ -4,10 +4,34 @@ const { generateToken } = require('../utils/common');
 const fileUpload = require('../lib/upload/fileUpload');
 
 
-router.get('/', (ctx, next) => {
-    ctx.body = 'file route'
-})
+router.get('/', async (ctx, next) => {
+    const fs = require("fs");
+    // const path = process.cwd() + '/upload/README.md';
+    const path = 'upload/README.md';
+    let data = '',
+        size = 0;
+    const getContent = () => {
+        return new Promise((resolve,reject)=>{
+            fs.open(path, 'r', (err, fd) => {
+                if (err) throw err
+                const rstrem = fs.createReadStream('', { fd });
+                rstrem.on('data', (oData) => {
+                    // console.log(data);
+                    data += oData;
+                    size += oData.length;
+                })
+                rstrem.on('end', (data) => {
+                    console.log('end');
+                    data = (data||'').toString();
+                    resolve();
+                })
+            })
+        })
+    }
 
+    await getContent();
+    ctx.body = data || 'file route';
+})
 
 /**
  * @description 获取上传key
