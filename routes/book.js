@@ -111,5 +111,14 @@ router.get('/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
     ctx.body = result
 })
 
+/**
+ * @description 记录上一次阅读的章节 
+ */
+router.post('/chapter/record', (ctx,next)=>{
+    // const { openid,bookId,bookNum } = ctx.request.body; 
+    // ctx.body = result
+    ctx.status = 204;
+})
+
 
 module.exports = router
