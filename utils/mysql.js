@@ -44,12 +44,12 @@ const pool = mysql.createPool(config.mysql);
 const logger = require('../lib/logger');
 let connection;
 
-function rTrim(c) {
+function rTrim(str,c) {
     if (!c) {
         c = ' ';
     }
     var reg = new RegExp('([' + c + ']*$)', 'gi');
-    return this.replace(reg, '');
+    return str.replace(reg, '');
 }
 
 
@@ -168,7 +168,7 @@ function execute(sql) {
                         protocol41: true }
                     ]
                  */
-                connection.release();//释放
+                // if(connection) connection.release();//释放
                 if (error) {
                     reject(error);
                     return;
@@ -232,8 +232,8 @@ function update(table, datas, where = null, order = null, limit = null) {
     for(let key in datas) {
         data += `${key}='${datas[key]}',` 
     }
-    data = rTrim(data);
-    const sql = `UPDATE ${table} SET ${data} ${parseWhere}`; 
+    data = rTrim(data,',');
+    const sql = `UPDATE ${table} SET ${data} ${parseWhere()}`; 
     return execute(sql)
 }
 

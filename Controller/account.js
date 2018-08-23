@@ -6,14 +6,14 @@ function isExitUser(openid) {
     return new Promise((resolve,reject)=>{
         find('user',`openid='${openid}'`,'*','',1)
         .then(res=>{
-            console.log(res);
+            console.log(223,res.length);
             if(res&&res.length) {
                 resolve()
             }else {
                 reject()
             }
         },err=>{
-            throw new isExitUser(err); 
+            // throw new isExitUser(err); 
         })
     })
 }
@@ -63,8 +63,7 @@ function wxLogin(code, ip) {
             isExitUser(openid)
                 .then(res => {
                     updateUser({ ip });
-                })
-                .catch(err => {
+                },err=>{
                     addUser({ openid, ip })
                 })
             resolve(openid);
