@@ -3,6 +3,9 @@ var router = new Router();
 const { wxLogin } = require('../Controller/account');
 
 router.get('/wxLogin', async (ctx, next) => {
+
+    const { query } = require('../utils/mysql');
+    query();
     ctx.body = 'wxLogin'
 })
 

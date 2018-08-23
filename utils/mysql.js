@@ -42,14 +42,19 @@
 const mysql = require('mysql');
 const config = require('./config.json');
 const pool = mysql.createPool(config.mysql);
+const logger = require('../lib/logger');
 let connection;
 
 function connect() {
     return new Promise((resolve, reject) => {
+        if(connection) {
+            return resolve();
+        }
         pool.getConnection(function (err, con) {
             // console.log(err,con);
             if (err) {
                 reject(err);
+                logger(err,'error');
                 return;
             }
             connection = con;
@@ -59,14 +64,29 @@ function connect() {
 }
 
 function query(query, params = {}, autoEnd = true) {
-    connect();
-    // connection.query('SELECT something FROM sometable', function (error, results, fields) {
-    //     // When done with the connection, release it.
-    //     connection.release();
-    //     // Handle error after the release.
-    //     if (error) throw error;
-    //     // Don't use the connection here, it has been returned to the pool.
-    // });
+    return new Promise((resolve, reject) => {
+        connect().then(res => {
+            connection.query(query, params, function (error, results, fields) {
+                // When done with the connection, release it.
+                connection.release();
+                // Handle error after the release.
+                if (error) {
+                    reject(error);
+                    logger(error,'error');
+                    return;
+                };
+                // Don't use the connection here, it has been returned to the pool.
+                resolve(results);
+                if (true === autoEnd) {
+                    connection.end();
+                }
+            });
+        })
+            .catch(err => {
+
+            })
+    })
+
 }
 
 
