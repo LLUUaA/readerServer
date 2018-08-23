@@ -6,8 +6,8 @@ function getRandomInt(min, max) {
 module.exports = {
     /**
      * 
-     * @param {生成token长度} len 
-     * @returns {token} token
+     * @param {number} len 
+     * @returns {string} token
      */
     generateToken(len = 20) {
         return crypto.randomBytes(len);
@@ -15,8 +15,8 @@ module.exports = {
 
     /**
      * 
-     * @param {是否返回时间戳} timestamp
-     * @returns { time } time
+     * @param {boolean} timestamp 是否返回时间戳
+     * @returns { string } time
      */
     getLocalTime(timestamp = false) {
         return timestamp ? Math.round(Date.now() / 1000) : new Date().toLocaleString();
