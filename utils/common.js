@@ -4,22 +4,34 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 module.exports = {
+
     /**
      * 
+     * @param {string} pwd 
+     * @param {string} key 
+     * @returns string
+     */
+    getPasswordSha1(pwd,key='') {
+        return crypto.createHash('sha1',key).update(pwd).digest('hex');
+    },
+
+    /**
      * @param {number} len 
      * @returns {string} token
      */
     generateToken(len = 20) {
-        return crypto.randomBytes(len);
+        return crypto.randomBytes(len).toString('hex');
     },
 
     /**
      * 
      * @param {boolean} timestamp 是否返回时间戳
+     * @param {format} format 是否返回时间戳
      * @returns { string } time
      */
-    getLocalTime(timestamp = false) {
-        return timestamp ? Math.round(Date.now() / 1000) : new Date().toLocaleString();
+    getLocalTime(timestamp = true,format='YYYY-MM-DD HH:mm:ss') {
+        const moment = require('moment');
+        return timestamp ? Math.round(Date.now() / 1000) :  moment().format(format);
     },
 
     /**

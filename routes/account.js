@@ -10,10 +10,10 @@ router.get('/wxLogin', async (ctx, next) => {
 })
 
 router.post('/wxLogin', async (ctx, next) => {
-    let openid;
+    let data = {};
     let { code } = ctx.request.body || {};
-    await wxLogin(code,ctx.request.ip).then(res => openid = res);
-    ctx.body = { openid };
+    await wxLogin(code,ctx.request.ip).then(res => data = res);
+    ctx.body = data;
 })
 
 module.exports = router

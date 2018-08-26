@@ -32,6 +32,7 @@ module.exports = async function (ctx, next) {
         }
     } catch (e) {
         // 输出详细的错误信息
+        e = e||'';
         ctx.body = {
             code: -1,
             error: e && e.message ? e.message : e.toString()

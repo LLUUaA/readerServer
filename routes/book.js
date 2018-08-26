@@ -5,23 +5,31 @@ const spiderPath = '../Controller/spider';
 /**
  * @description 获取home数据
  */
-
 router.get('/home',async (ctx,next)=>{
     const { getHome } = require(spiderPath);
     var result;
-    await getHome().then(res => {
-            result = res;
-        })
+    await getHome().then(res => result = res);
     ctx.body = result
+})
+
+/**
+ * @description 获取上一次阅读 
+ */
+router.get('/lastRead', async (ctx,next)=>{
+    const { getLastRead }  = require('../Controller/bookController');
+    const { userId } = ctx.request.body;
+    let result;
+    await getLastRead(userId,ctx.query.bookId)
+    .then(res=>result = res)
+    .catch(err=>result = null);
+    ctx.body = result;
 })
 
 /**
  * @description 获取配置
  */
-
 router.get('/getConfig', async (ctx, next) => {
-
-    const { name } =ctx.query;  
+    const { name } = ctx.query;  
     ctx.body = require(`../public/config/${name || 'gConfig'}.json`);
 })
 
@@ -32,9 +40,9 @@ router.get('/type/:type',async (ctx,next)=>{
     const { getBookType } = require(spiderPath);
     var result;
     const { type } = ctx.params;
-    await getBookType(type).then(res => {
-            result = res;
-        })
+    await getBookType(type)
+    .then(res => result = res)
+    .catch(err=>ctx.body = '查询出现错误');
     ctx.body = result
 })
 
@@ -57,9 +65,13 @@ router.get('/author/:author',async (ctx,next)=>{
  */
 router.get('/search/:keyword',async (ctx,next)=>{
     const { searchBook } = require(spiderPath);
-    var result;
-    if(ctx.params.keyword.length>1) {
-        await searchBook(ctx.params.keyword,ctx.query.pageIndex).then(res => {
+    const { searchRecord }  = require('../Controller/bookController');
+    const { userId } = ctx.request.body;
+    var result,
+    keyword = ctx.params.keyword;
+    if(keyword.length>1) {
+        searchRecord(userId,keyword);
+        await searchBook(keyword,ctx.query.pageIndex).then(res => {
             result = res;
         })
     }else{
@@ -103,8 +115,12 @@ router.get('/chapter/other/:bookId/:pageIndex',async (ctx,next)=>{
  */
 router.get('/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
     const { getChapterDetails } = require(spiderPath);
+    const { historyRecord } = require('../Controller/bookController');
+    const { bookId,chapterNum } = ctx.params;
+    const { userId } = ctx.request.body;
+
     var result;
-    const {bookId,chapterNum } = ctx.params;
+    historyRecord(bookId, chapterNum, userId);//记录阅读
     await getChapterDetails(bookId,chapterNum).then(res => {
             result = res;
         })
@@ -112,13 +128,46 @@ router.get('/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
 })
 
 /**
- * @description 记录上一次阅读的章节 
+ * @description 记录阅读的章节 
  */
-router.post('/chapter/record', (ctx,next)=>{
-    // const { openid,bookId,bookNum } = ctx.request.body; 
-    // ctx.body = result
+router.post('/chapter/record', (ctx, next) => {
+    const { historyRecord } = require('../Controller/bookController');
+    const { id, num, userId } = ctx.request.body;
+    historyRecord(id, num, userId);
     ctx.status = 204;
 })
 
+/**
+ * @description 记录搜索关键字 
+ */
+router.post('/search/record', (ctx, next) => {
+    const { searchRecord } = require('../Controller/bookController');
+    const { keyword, userId } = ctx.request.body;
+    searchRecord(keyword, userId);
+    ctx.status = 204;
+})
+
+/**
+ * @description 书架加入和取消（偷懒没用put）
+ */
+router.post('/bookshelf', (ctx, next) => {
+    const { bookShelf } = require('../Controller/bookController');
+    const { bookId, userId, bookInfo,status } = ctx.request.body;
+    bookShelf(userId, bookId, bookInfo, status);
+    ctx.status = 204;
+})
+
+/**
+ * @description 书架加入和取消
+ */
+router.get('/bookshelf', async (ctx, next) => {
+    const { getBookShelf } = require('../Controller/bookController');
+    const { userId } = ctx.request.body;
+    let result;
+    await getBookShelf(userId)
+    .then(res=>result=res)
+    .catch(err=>result = [])
+    ctx.body = result;
+})
 
 module.exports = router

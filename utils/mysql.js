@@ -128,7 +128,7 @@ function parseOrder(order) {
  * @param {any} fields 
  */
 function parseFields(fields) {
-    let fieldsStr = '';
+    let fieldsStr = '*';
     const fieldsType = typeof fields;
     if (Array.isArray(fields)) {
         fieldsStr = fields.join(',');
@@ -173,7 +173,7 @@ function execute(sql) {
                     reject(error);
                     return;
                 }
-                resolve(results, fields);
+                resolve({results, fields});
             });
         })
             .catch(logger)
@@ -227,7 +227,7 @@ function add(table, datas) {
  * @param {string} order 
  * @param {any} limit 
  */
-function update(table, datas, where = null, order = null, limit = null) {
+function    update(table, datas, where = null, order = null, limit = null) {
     let data = '';
     for(let key in datas) {
         data += `${key}='${datas[key]}',` 

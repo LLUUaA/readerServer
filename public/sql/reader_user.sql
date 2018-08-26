@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `openid` varchar(30) NOT NULL,
+  `password` varchar(64) NOT NULL,
   `nick_name` varchar(50) DEFAULT NULL,
   `register_time` int(11) DEFAULT NULL,
   `login_time` int(11) DEFAULT NULL,
