@@ -5,3 +5,7 @@
 
 2.html 解析使用temme [git地址](https://github.com/shinima/temme) 安装  npm install temme 
 
+# tips
+1.更新时注意 app.js ->authMidWare
+2.routes/account.js ->wxLogin
+3.routes/book.js ->historyRecord
