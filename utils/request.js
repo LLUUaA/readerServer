@@ -3,6 +3,7 @@ const { host } = require('./config.json');
 const HTTP = require('http');
 const HTTPS = require('https');
 const logger = require('../lib/logger');
+const iconv = require('iconv-lite');
 
 /**
  * @description hostname不能带协议(http|https) 自带http、https请求，否则报错。
@@ -32,34 +33,38 @@ module.exports = {
                 agent: false
             }, opt)
             
-            // if( options.method==="get" || options.method==="GET") {
-            //     options.path = 
-            // }
-
             // console.log('options',options);
             const req = reqHttp.request(options, (res) => {
                 // console.log('状态码：', res.statusCode);
                 // console.log('请求头：', res.headers);
-                var buff = "",
-                    isBuffer = false,
-                    result,
-                    size = 0;
+                // var buff = "",
+                //     isBuffer = false,
+                //     result,
+                //     size = 0;
+                var datas = [];
+                var size = 0;
+
                 res.on('data', (data) => {
                     // console.log('data', data);
-                    if (!isBuffer && Buffer.isBuffer(data)) {
-                        isBuffer = true;
-                    }
+                    // if (!isBuffer && Buffer.isBuffer(data)) {
+                    //     isBuffer = true;
+                    // }
+                    // buff += data;
+                    // size += data.length;
 
-                    buff += data;
-                    size += data.length;
+                    datas.push(data);  
+                    size += data.length;  
+    
+
+
                 })
                 res.on("end", function () {
-                    // var buff = Buffer.concat(datas, size);  
-                    // var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+                    var buff = Buffer.concat(datas, size);  
+                    var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
                     // var result = buff.toString();
-                    result = isBuffer ? buff.toString() : buff;
+                    // result = isBuffer ? buff.toString() : buff;
+                    // result = isBuffer ? iconv.decode(buff,"utf8") : buff;
                     resolve(result);
-                    // process.stdout.write('req end');
 
                 })
             });
