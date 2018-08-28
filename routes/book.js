@@ -65,11 +65,12 @@ router.get('/author/:author',async (ctx,next)=>{
 router.get('/search/:keyword',async (ctx,next)=>{
     const { searchBook } = require(spiderPath);
     const { searchRecord }  = require('../Controller/bookController');
-    const { userId } = ctx.request.body;
+    const { userId } = ctx.request.body ||{};
+
     var result,
     keyword = ctx.params.keyword;
     if(keyword.length>1) {
-        searchRecord(userId,keyword);
+        // searchRecord(userId,keyword);
         await searchBook(keyword,ctx.query.pageIndex).then(res => {
             result = res;
         })
@@ -113,7 +114,7 @@ router.get('/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
     const { getChapterDetails } = require(spiderPath);
     const { historyRecord } = require('../Controller/bookController');
     const { bookId,chapterNum } = ctx.params;
-    const { userId } = ctx.request.body;
+    const { userId } = ctx.request.body ||{};
 
     var result;
     // historyRecord(bookId, chapterNum, userId);//记录阅读
@@ -148,9 +149,8 @@ router.post('/search/record', (ctx, next) => {
  */
 router.post('/bookshelf', (ctx, next) => {
     const { bookShelf } = require('../Controller/bookController');
-    const { userId, content } = ctx.request.body;
-    // console.log('bookshelf',ctx.request.body);
-    bookShelf(userId, content);
+    const { userId, _array } = ctx.request.body;
+    bookShelf(userId, _array);
     ctx.status = 204;
 })
 

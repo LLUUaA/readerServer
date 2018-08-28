@@ -9,3 +9,4 @@
 1.更新时注意 app.js ->authMidWare
 2.routes/account.js ->wxLogin
 3.routes/book.js ->historyRecord
+4.routes/book.js ->searchRecord
