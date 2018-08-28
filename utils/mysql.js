@@ -240,8 +240,10 @@ function update(table, datas, where = null, order = null, limit = null) {
     return execute(sql)
 }
 
-function deleteRow() {
-
+function deleteRow(table,where=null,order=null,limit=0) {
+    if(!where) return new Error('query error');
+    const sql = `DELETE FROM ${table} ${parseWhere(where)} ${parseOrder(order)} ${parseLimit(limit)}`; 
+    return execute(sql)
 }
 
 module.exports = {
