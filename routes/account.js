@@ -4,8 +4,6 @@ const { wxLogin } = require('../Controller/account');
 const { find } = require('../utils/mysql');
 
 router.get('/wxLogin', async (ctx, next) => {
-    console.log(ctx.request.ip);
-    
     ctx.body = 'wxLogin'
 })
 

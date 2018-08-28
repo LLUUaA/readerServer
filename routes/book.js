@@ -59,7 +59,6 @@ router.get('/author/:author',async (ctx,next)=>{
     ctx.body = result
 })
 
-
 /**
  * @description 搜索
  */
@@ -81,7 +80,6 @@ router.get('/search/:keyword',async (ctx,next)=>{
     ctx.body = result
 })
 
-
 /**
  * @description 点击书籍进入页面
  */
@@ -95,7 +93,6 @@ router.get('/chapter/:bookId',async (ctx,next)=>{
     ctx.body = result
 })
 
-
 /**
  * @description 章节分页数据 
  */
@@ -108,7 +105,6 @@ router.get('/chapter/other/:bookId/:pageIndex',async (ctx,next)=>{
         })
     ctx.body = result
 })
-
 
 /**
  * @description 阅读章节 
@@ -152,8 +148,9 @@ router.post('/search/record', (ctx, next) => {
  */
 router.post('/bookshelf', (ctx, next) => {
     const { bookShelf } = require('../Controller/bookController');
-    const { bookId, userId, bookInfo,status } = ctx.request.body;
-    bookShelf(userId, bookId, bookInfo, status);
+    const { userId, content } = ctx.request.body;
+    // console.log('bookshelf',ctx.request.body);
+    bookShelf(userId, content);
     ctx.status = 204;
 })
 

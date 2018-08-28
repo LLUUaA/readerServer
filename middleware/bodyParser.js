@@ -27,7 +27,16 @@ module.exports = async function (ctx, next) {
                 req.on('end', async () => {
                     // end 
                     if (!ctx.request.body) ctx.request.body = {};
-                    ctx.request.body = Object.assign(ctx.request.body, JSON.parse(data.toString()));
+                    let parseData = JSON.parse(data.toString());
+                    if(Array.isArray(parseData)) {
+                        // 如果传入的是数组
+                        ctx.request.body = Object.assign(ctx.request.body, {_array:parseData} );
+                    }else {
+                        ctx.request.body = Object.assign(ctx.request.body,parseData );
+                    }
+
+
+  
                     resolve();
                 })
 

@@ -27,7 +27,7 @@ function getSession(userId) {
                         access_token: sessionKey,
                         expire_time: getLocalTime() + expire_time,
                         status: 1
-                    }).then(() => {
+                    },`user_id=${userId}`).then(() => {
                         resolve(sessionKey);
                     }, reject)
                 }

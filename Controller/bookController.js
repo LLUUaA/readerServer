@@ -30,23 +30,22 @@ function searchRecord( user_id,keyword) {
 /**
  * 
  * @param {number} user_id  
- * @param {number} book_id 
- * @param {string} book_info 
+ * @param {array} datas  
  * @param {int} status  是否添加书架 0取消书架
  * @description add || update (isAdd) 
  */
-function bookShelf(user_id, book_id, book_info, status=1) {
+function bookShelf(user_id, datas) {
     /**
      *
      * @param {boolean} hasBook 是否记录过
      */
-    const excuteBookShelf = (hasBook) => {
+    const excuteBookShelf = (hasBook, user_id, book_id, book_info, status) => {
         if (hasBook) {
             update('bookshelf', {
                 time: getLocalTime(false),
                 book_info,
                 status
-            })
+            },`book_id=${book_id}`)
         } else {
             add('bookshelf', {
                 user_id,
@@ -58,17 +57,24 @@ function bookShelf(user_id, book_id, book_info, status=1) {
         }
     }
 
-    find('bookshelf', `user_id=${user_id} and book_id=${book_id}`)
-        .then(res => {
-            book_info = 'object' === typeof book_info ?JSON.stringify(book_info):JSON.stringify({});
-            const { results } = res;
-            let hasBook = false;
-            if (results.length) {
-                hasBook = true;
-            }
-            excuteBookShelf(hasBook);
-        })
-        .catch(err => { })
+    const findBookShelf = (user_id, book_id, book_info, status) => {
+        find('bookshelf', `user_id=${user_id} and book_id=${book_id}`)
+            .then(res => {
+                book_info = 'object' === typeof book_info ? JSON.stringify(book_info) : JSON.stringify({});
+                const { results } = res;
+                let hasBook = false;
+                if (results.length) {
+                    hasBook = true;
+                }
+                excuteBookShelf(hasBook, user_id, book_id, book_info, status);
+            })
+            .catch(err => { })
+    }
+
+    for (let i = 0; i < datas.length; i++) {
+        let book = datas[i];
+        findBookShelf(user_id, book.bookId, book.bookInfo, book.status);
+    }
 }
 
 

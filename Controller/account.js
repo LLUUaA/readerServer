@@ -11,12 +11,12 @@ function isExitUser(openid) {
             .then(res => {
                 const { results } = res;
                 if (results && results.length) {
-                    resolve()
+                    resolve(results[0].id);
                 } else {
                     reject()
                 }
             }, err => {
-                // throw new isExitUser(err); 
+                new Error(err);
             })
     })
 }
@@ -33,10 +33,10 @@ function addUser(userData) {
     // userData.login_time = getLocalTime(true);
     // userData.status = 1;
     const key = '.@o0o0o0o0o0@.';
-    add('user', {
+   return add('user', {
         openid: userData.openid,
         nick_name: '',
-        password: getPasswordSha1('123456', key),
+        password: getPasswordSha1(userData.openid, key),
         register_time: getLocalTime(false),
         login_time: getLocalTime(false),
         login_ip: userData.ip,
@@ -65,18 +65,19 @@ function  wxLogin(code, ip) {
         getWxData(code).then(res => {
             const openid = JSON.parse(res).openid;
             isExitUser(openid)
-                .then(res => {
+                .then(userId => {
                     updateUser({ ip });
+                    getSession(userId)
+                    .then(session=>resolve({session}))
                 }, err => {
                     addUser({ openid, ip })
+                    .then(res=>{
+                        const { results } = res;
+                        getSession(results.insertId)
+                        .then(session=>resolve({session}))
+                    },new Error)
                 })
-                getSession(1)
-                .then(session=>{
-                    resolve({
-                        // openid,
-                        session
-                    });
-                })
+
         }, resolve);
     })
 }

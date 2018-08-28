@@ -201,7 +201,10 @@ function find(table, where = null, fields = '*', order = null, limit = null) {
 function add(table, datas) {
     let values = [],
         data = [];
-    if ('object' === typeof datas) {
+
+    if(Array.isArray(datas)) {
+            
+    }else if ('object' === typeof datas) {
         for (let key in datas) {
             // values += `${key},`;
             // data += `'${datas[key]},'`;
@@ -227,13 +230,13 @@ function add(table, datas) {
  * @param {string} order 
  * @param {any} limit 
  */
-function    update(table, datas, where = null, order = null, limit = null) {
+function update(table, datas, where = null, order = null, limit = null) {
     let data = '';
     for(let key in datas) {
         data += `${key}='${datas[key]}',` 
     }
     data = rTrim(data,',');
-    const sql = `UPDATE ${table} SET ${data} ${parseWhere()}`; 
+    const sql = `UPDATE ${table} SET ${data} ${parseWhere(where)}`; 
     return execute(sql)
 }
 

@@ -2,11 +2,11 @@
     "personIntro":"旨在为各位想看或者找不到资源还有需要付费的书籍提供阅读，本小程序不断追求更完善的用户体验！\n 如有什么意见或建议到我的页面进行反馈。",
     "bgImg":"",
     "weixinQrCode":"https://www.bubaocloud.xin/public/weixin_qrcode.jpg",
-    "weixinPay":"https://www.bubaocloud.xin/public/wxpay_code.png",
+    "weixinPay":"https://www.bubaocloud.xin/public/wxpay_code.jpg",
     "aliPay":"https://www.bubaocloud.xin/public/alipay_code.jpg",
     "authorTxt":"作者信息",
     "introTxt":"小程序说明",
     "supportTxt":"支持作者",
     "authorName":"PPLL",
-    "authorAvatarUrl" :"https://wx.qlogo.cn/mmopen/vi_32/SeEVaibMYLfYuGnQ4AmmXhFPZuVh3fNFAmmiakQkt7taQwgxJGYJ66o6KOcPK2lmrOdNjq9qFrzg4nkqLzQNicOVA/132"
+    "authorAvatarUrl" :"https://www.bubaocloud.xin/public/author_avartar.jpg"
 }
