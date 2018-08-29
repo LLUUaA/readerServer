@@ -57,7 +57,7 @@ function updateUser(userData) {
         nick_name: '',
         login_time: getLocalTime(false),
         login_ip: userData.ip
-    })
+    },`id=${userData.userId}`)
 }
  
 function  wxLogin(code, ip) {
@@ -66,7 +66,7 @@ function  wxLogin(code, ip) {
             const openid = JSON.parse(res).openid;
             isExitUser(openid)
                 .then(userId => {
-                    updateUser({ ip });
+                    updateUser({ ip,userId });
                     getSession(userId)
                     .then(session=>resolve({session}))
                 }, err => {

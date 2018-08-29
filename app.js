@@ -9,7 +9,7 @@ const enterRouter = require('./routes/index');
 
 app.use(response);//处理响应 middlewar
 app.use(cros);//解决跨域 middleware
-// app.use(authMidWare);//处理auth middlewar
+app.use(authMidWare);//处理auth middlewar
 app.use(bodyParser);//处理body parse middlewar
 
 app.use(enterRouter.routes()).use(enterRouter.allowedMethods());

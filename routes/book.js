@@ -70,7 +70,7 @@ router.get('/search/:keyword',async (ctx,next)=>{
     var result,
     keyword = ctx.params.keyword;
     if(keyword.length>1) {
-        // searchRecord(userId,keyword);
+        searchRecord(userId,keyword);
         await searchBook(keyword,ctx.query.pageIndex).then(res => {
             result = res;
         })
@@ -117,7 +117,7 @@ router.get('/chapter/details/:bookId/:chapterNum',async (ctx,next)=>{
     const { userId } = ctx.request.body ||{};
 
     var result;
-    // historyRecord(bookId, chapterNum, userId);//记录阅读
+    historyRecord(bookId, chapterNum, userId);//记录阅读
     await getChapterDetails(bookId,chapterNum).then(res => {
             result = res;
         })

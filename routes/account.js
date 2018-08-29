@@ -9,8 +9,8 @@ router.get('/wxLogin', async (ctx, next) => {
 
 router.post('/wxLogin', async (ctx, next) => {
     let data = {};
-    let { code } = ctx.request.body || {session:'abcd'};
-    // await wxLogin(code,ctx.request.ip).then(res => data = res);
+    let { code } = ctx.request.body || {};
+    await wxLogin(code,ctx.request.header["x-real-ip"]||'').then(res => data = res);
     ctx.body = data;
 })
 

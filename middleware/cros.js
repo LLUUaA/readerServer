@@ -10,7 +10,9 @@ module.exports = async function (ctx, next) {
         const getCrosStatus = (url) => {
             const urlList = [
                 'http://localhost:8080',
-                'http://192.168.66.100:8080'
+                'http://localhost:7000',
+                'http://192.168.66.100:8080',
+                'http://127.0.0.1:7000'
             ];
             return urlList.indexOf(url) >= 0 ? true : false;
         }
@@ -24,7 +26,7 @@ module.exports = async function (ctx, next) {
              */
             ctx.set('Access-Control-Allow-Origin', origin);
 
-            if(ctx.path== '/api/file') ctx.set('Access-Control-Allow-Headers','Content-Range')//file upload
+            if(ctx.path== '/file') ctx.set('Access-Control-Allow-Headers','Content-Range')//file upload
             // ctx.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT');
             ctx.set('Access-Control-Allow-Methods', 'POST, GET');
             // ctx.set('Access-Control-Max-Age', 1000);
