@@ -33,8 +33,8 @@ module.exports = async function (ctx, next) {
                     resolve();
                 }, err => {
                     ctx.status = 401;
-                    ctx.body = 'Unauthorized';
-                    reject('Unauthorized');
+                    ctx.body = err.msg || 'Unauthorized';
+                    reject(ctx.body);
                 })
         })
     }

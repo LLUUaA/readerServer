@@ -1,6 +1,6 @@
 const { find, add, update } = require('../utils/mysql');
 const { generateToken, getLocalTime } = require('../utils/common');
-const expire_time = 1800*2;
+const expire_time = 1800; 
 /**
  * 
  * @param {number} userId 
@@ -45,24 +45,24 @@ function checkSession(session) {
         find('session', `access_token='${session}' ORDER BY expire_time`)
             .then(res => {
                 const { results } = res;
-                const sessionData = results[0]||false;
+                const sessionData = results[0] || false;
+
                 if (!sessionData
                     || sessionData.status === 0
-                    || session !== sessionData.access_token
-                     ) {
-                        reject({
-                            msg: 'session error'
-                        });
-                        return;
-                     }
-                if (getLocalTime() > sessionData.expire_time ) {
+                ) {
+                    reject({
+                        msg: 'session error'
+                    });
+                    return;
+                }
+                if (getLocalTime() > sessionData.expire_time) {
                     //session 已过期||无效
                     reject({
                         msg: 'session is expired'
                     });
-                    update('session',{
-                        status:0
-                    })
+                    update('session', {
+                        status: 0
+                    },`id=${sessionData.id}`)
                     return;
                 }
                 resolve({
