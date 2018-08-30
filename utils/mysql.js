@@ -175,6 +175,12 @@ function execute(sql) {
                 }
                 resolve({results, fields});
             });
+        },err=>{
+            if(connection) connection.release();//释放
+            connection = null; 
+            execute(resolve,reject);//继续查询
+            logger(err);
+            reject(err);
         })
             .catch(logger)
     })
