@@ -146,43 +146,58 @@ function parseFields(fields) {
 function execute(sql) {
     return new Promise((resolve, reject) => {
         console.log('sql', sql);
-        connect().then(() => {
-            connection.query(sql, function (error, results, fields) {
-                /**
-                 * results 查询结果
-                 * fields 数据字段显示 FieldPacket->name
-                 * [FieldPacket {
-                        catalog: 'def',
-                        db: 'reader',
-                        table: 'user',
-                        orgTable: 'user',
-                        name: 'id',
-                        orgName: 'id',
-                        charsetNr: 63,
-                        length: 10,
-                        type: 3,
-                        flags: 16899,
-                        decimals: 0,
-                        default: undefined,
-                        zeroFill: false,
-                        protocol41: true }
-                    ]
-                 */
-                // if(connection) connection.release();//释放
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve({results, fields});
-            });
-        },err=>{
-            if(connection) connection.release();//释放
-            connection = null; 
-            execute(resolve,reject);//继续查询
-            logger(err);
-            reject(err);
-        })
-            .catch(logger)
+        try {
+            connect().then(() => {
+                connection.query(sql, function (error, results, fields) {
+                    /**
+                     * results 查询结果
+                     * fields 数据字段显示 FieldPacket->name
+                     * [FieldPacket {
+                            catalog: 'def',
+                            db: 'reader',
+                            table: 'user',
+                            orgTable: 'user',
+                            name: 'id',
+                            orgName: 'id',
+                            charsetNr: 63,
+                            length: 10,
+                            type: 3,
+                            flags: 16899,
+                            decimals: 0,
+                            default: undefined,
+                            zeroFill: false,
+                            protocol41: true }
+                        ]
+                     */
+                    // if(connection) connection.release();//释放
+                    if (error) {
+                        // reject(error);
+                        console.log('connection err', error);
+                        if (connection) connection.release();//释放
+                        connection = null;
+                        execute(sql).then(resolve, reject);//继续查询
+                        logger(error);
+                        return;
+                    }
+                    resolve({ results, fields });
+                });
+            }, err => {
+                console.log('connection err233', err);
+                if (connection) connection.release();//释放
+                connection = null;
+                execute(sql).then(resolve, reject);//继续查询
+                logger(err);
+            })
+                .catch(logger)
+
+        } catch (error) {
+            console.log('connection err catch', error);
+            if (connection) connection.release();//释放
+            connection = null;
+            execute(sql).then(resolve, reject);//继续查询
+            logger(error);
+            return;
+        }
     })
 }
 

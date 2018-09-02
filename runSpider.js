@@ -22,7 +22,7 @@
             clearFun(bookId);
         };
 
-        //濡傛灉涓嶅瓨鍦╞ook id
+        //如果不存在book id
         if (!fs.existsSync(basePath)) {
             next(bookId);
             return;
