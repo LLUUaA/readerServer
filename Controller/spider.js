@@ -304,7 +304,7 @@ function getChapterDetails(bookId,chapterNum=1) {
              * mobile selector
              */
             const selector = {
-                content:`#content .articlecon p@ {&{$}}`,
+                content:`.content .articlecon p@ {&{$}}`,
                 chapterName:`.content .titlename{$}`
             }
             chapterContent = temme(html, selector.content);
