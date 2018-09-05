@@ -305,10 +305,12 @@ function getChapterDetails(bookId,chapterNum=1) {
              */
             const selector = {
                 content:`.content .articlecon p@ {&{$}}`,
-                chapterName:`.content .titlename{$}`
+                content2:`#content .articlecon p@ {&{$}}`,
+                chapterName:`.content .titlename{$}`,
+                chapterName2:`#content .titlename{$}`
             }
-            chapterContent = temme(html, selector.content);
-            chapterName = temme(html, selector.chapterName);
+            chapterContent = temme(html, selector.content) || temme(html, selector.content2);
+            chapterName = temme(html, selector.chapterName) || temme(html, selector.chapterName2);
             resolve({chapterName,chapterContent});
         },err=>{
             logger(err);
