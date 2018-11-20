@@ -6,7 +6,8 @@ const logger = require('../lib/logger');
 
 function isAllowType(contentType) {
     const allowList = [
-        'application/json'
+        'application/json',
+        'application/x-www-form-urlencoded'
     ];
     return allowList.indexOf(contentType) >= 0 ? true : false;
 }
