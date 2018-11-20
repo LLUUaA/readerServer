@@ -4,6 +4,8 @@ const HTTP = require('http');
 const HTTPS = require('https');
 const logger = require('../lib/logger');
 const iconv = require('iconv-lite');
+const querystring = require('querystring');
+// const Buffer = require('buffer');
 
 /**
  * @description hostname不能带协议(http|https) 自带http、https请求，否则报错。
@@ -18,9 +20,7 @@ module.exports = {
     request(opt, isHttps = true) {
         return new Promise((resolve, reject) => {
             const reqHttp = isHttps ? HTTPS : HTTP;
-
-            const postData = JSON.stringify(opt.data || {});
-
+            const postData = querystring.stringify(opt.data || {});
             var options = Object.assign({
                 hostname: host.hostname,
                 method: 'GET',
@@ -28,12 +28,12 @@ module.exports = {
                 port: host.port,
                 headers: {
                     "Content-Type": 'application/json',
-                    "Content-Length": postData.length
+                    "Content-Length": Buffer.byteLength(postData)
                 },        
                 agent: false
             }, opt)
             
-            // console.log('options',options);
+            console.log('options',options);
             const req = reqHttp.request(options, (res) => {
                 // console.log('状态码：', res.statusCode);
                 // console.log('请求头：', res.headers);
@@ -75,7 +75,7 @@ module.exports = {
                 reject(e);
             });
 
-            req.write(postData);
+            if(opt.method === 'post') req.write(postData);    
             req.end();
         })
     },
