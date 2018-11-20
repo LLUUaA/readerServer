@@ -10,7 +10,7 @@ function isCheckAuth(api) {
     const index = api.indexOf('?');
     api = index>0 ? api.substr(0, index) : api;
     const allowList = [
-        '',
+        '/',
         '/book/getConfig',
         '/account/wxLogin'
     ];

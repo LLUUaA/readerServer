@@ -283,39 +283,60 @@ function getOtherChapter(bookId, pageIndex = 1) {
  * 
  */
 
-function getChapterDetails(bookId,chapterNum=1) {
+function getChapterDetails(bookId, chapterNum = 1) {
     return new Promise((resolve, reject) => {
-        request({
-            hostname: spider.mobileBaseUrl,
-            path: `/${bookId}/read_${chapterNum}.html`,
-            port: 443
-        }).then(res=>{
-            var chapterContent,chapterName;
-            const html = res;
-            /**
-             * pc selector
-             */
-            // const selector = {
-            //     content:`.readpage .readbox #chaptercontent{$}`,
-            //     chapterName:`.readpage .readbox .title h1 a{$}`
-            // }
+        let chapterContent = [], chapterName;
 
-            /**
-             * mobile selector
-             */
-            const selector = {
-                content:`.content .articlecon p@ {&{$}}`,
-                content2:`#content .articlecon p@ {&{$}}`,
-                chapterName:`.content .titlename{$}`,
-                chapterName2:`#content .titlename{$}`
-            }
-            chapterContent = temme(html, selector.content) || temme(html, selector.content2);
-            chapterName = temme(html, selector.chapterName) || temme(html, selector.chapterName2);
-            resolve({chapterName,chapterContent});
-        },err=>{
-            logger(err);
-            reject(err);
-        })
+        /**
+         * 
+         * @param {string} path 
+         */
+        const getDetails = (path) => {
+            request({
+                hostname: spider.mobileBaseUrl,
+                path,
+                port: 443
+            }).then(res => {
+                const html = res;
+                /**
+                 * pc selector
+                 */
+                // const selector = {
+                //     content:`.readpage .readbox #chaptercontent{$}`,
+                //     chapterName:`.readpage .readbox .title h1 a{$}`
+                // }
+                /**
+                 * mobile selector
+                 */
+                const selector = {
+                    content: `.content .articlecon p@ {&{$}}`,
+                    content2: `#content .articlecon p@ {&{$}}`,
+                    chapterName: `.content .titlename{$}`,
+                    chapterName2: `#content .titlename{$}`,
+                    nextPage: `.content .articlebtn .nextinfo{$}`,
+                    nextPage2: `#content .articlebtn .nextinfo{$}`,
+                    nextPath:`.content .articlebtn .nextinfo[href=$];`,
+                    nextPath2:`#content .articlebtn .nextinfo[href=$];`
+                };
+                const hasNext = temme(html, selector.nextPage) === '下一页' || temme(html, selector.nextPage2) === '下一页' || false;
+                chapterContent = chapterContent.concat(temme(html, selector.content) || temme(html, selector.content2));
+                chapterName = temme(html, selector.chapterName) || temme(html, selector.chapterName2) || chapterName;
+
+                console.log('chapterName',chapterName);
+                if(hasNext) {
+                    const nextPath = temme(html, selector.nextPath) || temme(html, selector.nextPath2);
+                    getDetails(nextPath)
+                }else {
+                    resolve({ chapterName, chapterContent });
+                }
+                // resolve({ chapterName, chapterContent });
+            },err=>{
+                logger(err);
+                reject(err);
+            });
+        }
+
+        getDetails(`/${bookId}/read_${chapterNum}.html`); //首章
     })
 }
 
