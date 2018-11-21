@@ -20,7 +20,7 @@ module.exports = {
      * @returns {string} token
      */
     generateToken(len = 20) {
-        return crypto.randomBytes(len).toString('hex');
+        return (crypto.randomBytes(Math.ceil(len/2))).toString('hex');
     },
 
     /**
