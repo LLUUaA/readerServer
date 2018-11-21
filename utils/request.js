@@ -33,7 +33,7 @@ module.exports = {
                 agent: false
             }, opt)
             
-            console.log('options',options);
+            // console.log('options',options);
             const req = reqHttp.request(options, (res) => {
                 // console.log('状态码：', res.statusCode);
                 // console.log('请求头：', res.headers);
@@ -64,7 +64,12 @@ module.exports = {
                     // var result = buff.toString();
                     // result = isBuffer ? buff.toString() : buff;
                     // result = isBuffer ? iconv.decode(buff,"utf8") : buff;
-                    resolve(result);
+                    try {
+                        resolve(JSON.parse(result));
+                    } catch (error) {
+                        resolve(result);
+                    }
+                   
 
                 })
             });
@@ -75,7 +80,7 @@ module.exports = {
                 reject(e);
             });
 
-            if(opt.method === 'post') req.write(postData);    
+            req.write(postData);    
             req.end();
         })
     },
