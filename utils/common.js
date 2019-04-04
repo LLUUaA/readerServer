@@ -11,8 +11,8 @@ module.exports = {
      * @param {string} key 
      * @returns string
      */
-    getPasswordSha1(pwd,key='') {
-        return crypto.createHash('sha1',key).update(pwd).digest('hex');
+    getPasswordSha1(pwd,key='',algorithm='sha1') {
+        return crypto.createHash(algorithm,key).update(String(pwd)).digest('hex');
     },
 
     /**
@@ -20,7 +20,7 @@ module.exports = {
      * @returns {string} token
      */
     generateToken(len = 20) {
-        return (crypto.randomBytes(Math.ceil(len/2))).toString('hex');
+        return crypto.randomBytes(len).toString('hex');
     },
 
     /**

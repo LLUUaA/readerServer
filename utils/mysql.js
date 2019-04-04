@@ -1,50 +1,11 @@
-
-// function Mysql() {
-//     this.connection;
-// }
-// /**
-//  * 
-//  * @param {条件} query 
-//  * @param {参数} params 
-//  * @param {自动end连接} autoEnd 
-//  */
-// Mysql.prototype.query = function (query, params = {}, autoEnd = false) {
-//     return new Promise((resolve, reject) => {
-//         const mysql = require('mysql');
-//         const config = require('./config.json');
-//         this.connection = mysql.createConnection(config.mysql);
-//         this.connection.connect();
-//         this.connection.query(query, params, function (error, results, fields) {
-//             if (error) throw error; //to do 开发用
-//             // if (error) {
-//             //     return reject(error);
-//             // }
-
-//             resolve(results);
-//             if (true === autoEnd) {
-//                 this.connection.end(); 
-//             }
-//         });
-//     })
-// }
-// Mysql.prototype.end = function () {
-//     try {
-//         this.connection.end();
-//     } catch (error) {
-//         throw error; // to do
-//     }
-
-// }
-
-// module.exports = Mysql
-
 const mysql = require('mysql');
-const config = require('./config.json');
+const config = require("./config.json");
 const pool = mysql.createPool(config.mysql);
 const logger = require('../lib/logger');
-let connection;
+const TYR_TIMES = 3;
+let connection, errTimes = 0;
 
-function rTrim(str,c) {
+function rTrim(str, c) {
     if (!c) {
         c = ' ';
     }
@@ -58,10 +19,11 @@ function connect() {
         if (connection) {
             return resolve();
         }
+
         pool.getConnection(function (err, con) {
             if (err) {
-                reject(err);
                 logger(err, 'error');
+                reject(err);
                 return;
             }
             connection = con;
@@ -100,7 +62,7 @@ function parseLimit(limit) {
         } else {
             limitStr = ` LIMIT ${limit[0]}`
         }
-    } else if (limit && limitType === 'string') {
+    } else if (limit) {
         limitStr = `LIMIT ${limit}`;
     }
 
@@ -170,25 +132,42 @@ function execute(sql) {
                         ]
                      */
                     // if(connection) connection.release();//释放
+
                     if (error) {
                         // reject(error);
-                        console.log('connection err', error);
                         if (connection) connection.release();//释放
                         connection = null;
+                        if (errTimes > TYR_TIMES) {
+                            reject({
+                                code:-1,
+                                msg:'Query Error'
+                            })
+                            return;
+                        }
+                        ++errTimes;
                         execute(sql).then(resolve, reject);//继续查询
                         logger(error);
                         return;
                     }
-                    resolve({ results, fields });
+                    errTimes = 0;
+                    resolve(results);
                 });
             }, err => {
-                console.log('connection err233', err);
                 if (connection) connection.release();//释放
                 connection = null;
-                execute(sql).then(resolve, reject);//继续查询
+                // execute(sql).then(resolve, reject);//继续查询
+                reject({
+                    code:-1,
+                    msg:'MYSQL Access Error'
+                })
+                logger(err);
+            }).catch(err=>{
+                reject({
+                    code:-1,
+                    msg:'MYSQL Connect Error'
+                })
                 logger(err);
             })
-                .catch(logger)
 
         } catch (error) {
             console.log('connection err catch', error);
@@ -223,9 +202,9 @@ function add(table, datas) {
     let values = [],
         data = [];
 
-    if(Array.isArray(datas)) {
-            
-    }else if ('object' === typeof datas) {
+    if (Array.isArray(datas)) {
+
+    } else if ('object' === typeof datas) {
         for (let key in datas) {
             // values += `${key},`;
             // data += `'${datas[key]},'`;
@@ -253,17 +232,17 @@ function add(table, datas) {
  */
 function update(table, datas, where = null, order = null, limit = null) {
     let data = '';
-    for(let key in datas) {
-        data += `${key}='${datas[key]}',` 
+    for (let key in datas) {
+        data += `${key}='${datas[key]}',`
     }
-    data = rTrim(data,',');
-    const sql = `UPDATE ${table} SET ${data} ${parseWhere(where)}`; 
+    data = rTrim(data, ',');
+    const sql = `UPDATE ${table} SET ${data} ${parseWhere(where)}`;
     return execute(sql)
 }
 
-function deleteRow(table,where=null,order=null,limit=0) {
-    if(!where) return new Error('query error');
-    const sql = `DELETE FROM ${table} ${parseWhere(where)} ${parseOrder(order)} ${parseLimit(limit)}`; 
+function deleteRow(table, where = null, order = null, limit = 0) {
+    if (!where) return new Error('query error');
+    const sql = `DELETE FROM ${table} ${parseWhere(where)} ${parseOrder(order)} ${parseLimit(limit)}`;
     return execute(sql)
 }
 
@@ -271,5 +250,6 @@ module.exports = {
     find,
     add,
     update,
+    delete: deleteRow,
     deleteRow
 }
