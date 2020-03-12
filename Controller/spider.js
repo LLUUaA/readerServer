@@ -4,6 +4,7 @@ const { defineFilter } = require('temme');
 const { getHtml, request } = require('../utils/request');
 const { spider } = require('../config/index.config');
 const fs = require("fs");
+const nodePath = require("path");
 
 /**
  * @function {filterData} 过滤空数据
@@ -83,7 +84,7 @@ function getTypePage(page){
 
 function getHome() {
     return new Promise((resolve, reject) => {
-        const homeDataPath = `${process.cwd()}/public/data`,
+        const homeDataPath = nodePath.resolve(__dirname, '../public/data'),
             homeDataName = 'bookHomeData.txt';
 
         const getData  = function (){
@@ -120,7 +121,7 @@ function getHome() {
                         if (!fs.existsSync(homeDataPath)) {
                             fs.mkdirSync(homeDataPath);
                         }
-                        fs.writeFile(`${homeDataPath}/${homeDataName}`, JSON.stringify(data),err=>{
+                        fs.writeFile(nodePath.resolve(homeDataPath,homeDataName), JSON.stringify(data),err=>{
                             if(err) logger(err);
                         });
                         // resolve({ hotBook, subMenu });
@@ -131,7 +132,7 @@ function getHome() {
             })
         }
 
-        fs.open(`${homeDataPath}/${homeDataName}`, 'r', (err, fd) => {
+        fs.open(nodePath.resolve(homeDataPath,homeDataName), 'r', (err, fd) => {
             if (err) {
                 getData().then(resolve,reject);
                 logger(err);
