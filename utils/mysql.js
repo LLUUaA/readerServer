@@ -1,9 +1,11 @@
 const mysql = require('mysql');
-const config = require("./config.json");
-const pool = mysql.createPool(config.mysql);
+const config = require("../config/index.config");
 const logger = require('../lib/logger');
-const TYR_TIMES = 3;
-let connection, errTimes = 0;
+const TYR_TIMES = 2;
+const RELEASE_TIMES = 1000 * 60 * 30; // 30 min
+let pool = null,
+    taskTimer = null, // 任务定时器
+    errTimes = 0; // query查询错误次数
 
 function rTrim(str, c) {
     if (!c) {
@@ -11,30 +13,6 @@ function rTrim(str, c) {
     }
     var reg = new RegExp('([' + c + ']*$)', 'gi');
     return str.replace(reg, '');
-}
-
-
-function connect() {
-    return new Promise((resolve, reject) => {
-        if (connection) {
-            return resolve();
-        }
-
-        pool.getConnection(function (err, con) {
-            if (err) {
-                logger(err, 'error');
-                reject(err);
-                return;
-            }
-            connection = con;
-            resolve();
-        })
-    })
-}
-
-function end() {
-    connection.end();
-    connection = null;
 }
 
 /**
@@ -46,7 +24,7 @@ function parseWhere(where) {
     if (where && 'string' === typeof where) {
         whereStr = where;
     }
-    return whereStr ? `WHERE ${whereStr}` : '';//whereStr 加上 '',否则会报错。
+    return whereStr ? `WHERE ${whereStr}` : ''; //whereStr 加上 '',否则会报错。
 }
 
 /**
@@ -101,82 +79,69 @@ function parseFields(fields) {
     return fieldsStr;
 }
 
+
+/**
+ * @description释放连接池任务
+ */
+function releasePoolTask() {
+    if (taskTimer) {
+        clearTimeout(taskTimer);
+        taskTimer = null;
+    }
+    taskTimer = setTimeout(() => {
+        pool.end(function (err) {
+            if (err) {
+                return logger(err);
+            }
+            pool = null;
+        }); // 关闭连接池
+
+    }, RELEASE_TIMES);
+}
+
 /**
  * @description 执行查询
  * @param {string} sql 
  */
 function execute(sql) {
+    // console.log('sql', sql);
     return new Promise((resolve, reject) => {
-        console.log('sql', sql);
-        try {
-            connect().then(() => {
-                connection.query(sql, function (error, results, fields) {
-                    /**
-                     * results 查询结果
-                     * fields 数据字段显示 FieldPacket->name
-                     * [FieldPacket {
-                            catalog: 'def',
-                            db: 'reader',
-                            table: 'user',
-                            orgTable: 'user',
-                            name: 'id',
-                            orgName: 'id',
-                            charsetNr: 63,
-                            length: 10,
-                            type: 3,
-                            flags: 16899,
-                            decimals: 0,
-                            default: undefined,
-                            zeroFill: false,
-                            protocol41: true }
-                        ]
-                     */
-                    // if(connection) connection.release();//释放
-
-                    if (error) {
-                        // reject(error);
-                        if (connection) connection.release();//释放
-                        connection = null;
-                        if (errTimes > TYR_TIMES) {
-                            reject({
-                                code:-1,
-                                msg:'Query Error'
-                            })
-                            return;
-                        }
-                        ++errTimes;
-                        execute(sql).then(resolve, reject);//继续查询
-                        logger(error);
-                        return;
-                    }
+        if (taskTimer) {
+            clearTimeout(taskTimer);
+            taskTimer = null;
+        };
+        if (!pool) {
+            pool = mysql.createPool(config.mysql);
+        }
+        pool.getConnection(function (err, connection) {
+            if (err) {
+                reject({
+                    code: -1,
+                    msg: 'MYSQL Connect Error'
+                })
+                logger(err);
+                return;
+            }
+            connection.query(sql, function (error, results) {
+                connection.release(); //释放!!!
+                if (!error) {
                     errTimes = 0;
                     resolve(results);
-                });
-            }, err => {
-                if (connection) connection.release();//释放
-                connection = null;
-                // execute(sql).then(resolve, reject);//继续查询
-                reject({
-                    code:-1,
-                    msg:'MYSQL Access Error'
-                })
-                logger(err);
-            }).catch(err=>{
-                reject({
-                    code:-1,
-                    msg:'MYSQL Connect Error'
-                })
-                logger(err);
-            })
-
-        } catch (error) {
-            console.log('connection err catch', error);
-            if (connection) connection.release();//释放
-            connection = null;
-            execute(sql).then(resolve, reject);//继续查询
-            logger(error);
-            return;
-        }
+                    releasePoolTask();
+                    return;
+                }
+                // 重试次数
+                if (errTimes >= TYR_TIMES) {
+                    return reject({
+                        errno: error.errno,
+                        msg: error.sqlMessage
+                    })
+                };
+                ++errTimes;
+                execute(sql).then(resolve, reject); //继续查询
+                logger(error);
+            });
+        });
     })
 }
 
@@ -201,25 +166,32 @@ function find(table, where = null, fields = '*', order = null, limit = null) {
 function add(table, datas) {
     let values = [],
         data = [];
-
-    if (Array.isArray(datas)) {
-
-    } else if ('object' === typeof datas) {
+    if ('object' === typeof datas) {
         for (let key in datas) {
             // values += `${key},`;
             // data += `'${datas[key]},'`;
             values.push(key);
-            data.push(`'${datas[key]}'`);
+            data.push(`'${datas[key] ||''}'`);
         }
 
         values = values.join(',');
         data = data.join(',');
-    } else {
-        data = datas;
     }
-
     const sql = `INSERT INTO ${table} (${values}) VALUES (${data})`;
     return execute(sql)
+}
+
+function addRow(table, fields, datas) {
+    const values = (datas || [])
+        .map(v =>
+            v.map(k => `'${k}'`)
+            .join(','))
+        .map(v => `(${v})`)
+        .join(",");
+
+    const sql = `INSERT INTO ${table} (${fields.join(',')}) VALUES ${values}`;
+
+    return execute(sql);
 }
 
 /**
@@ -246,10 +218,16 @@ function deleteRow(table, where = null, order = null, limit = 0) {
     return execute(sql)
 }
 
+function sql(sql) {
+    return execute(sql);
+}
+
 module.exports = {
     find,
     add,
+    addRow,
     update,
     delete: deleteRow,
-    deleteRow
+    deleteRow,
+    sql
 }

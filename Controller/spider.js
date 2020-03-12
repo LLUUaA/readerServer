@@ -2,7 +2,7 @@ const temme = require('temme').default; //or import temme from 'temme'
 const logger = require('../lib/logger');
 const { defineFilter } = require('temme');
 const { getHtml, request } = require('../utils/request');
-const { spider } = require('../utils/config.json');
+const { spider } = require('../config/index.config');
 const fs = require("fs");
 
 /**

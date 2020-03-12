@@ -1,4 +1,4 @@
-const { wxConfig } = require('../config.json');
+const { wxConfig } = require('../../config/index.config');
 /**
  * 
  * @param {String} code -wxLogin code
