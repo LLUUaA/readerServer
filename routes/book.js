@@ -160,11 +160,7 @@ router.post('/bookshelf', (ctx, next) => {
 router.get('/bookshelf', async (ctx, next) => {
     const { getBookShelf } = require('../Controller/bookController');
     const { userId } = ctx.request.body;
-    let result;
-    await getBookShelf(userId)
-    .then(res=>result=res)
-    .catch(err=>result = [])
-    ctx.body = result;
+    ctx.body = await getBookShelf(userId);
 })
 
 module.exports = router

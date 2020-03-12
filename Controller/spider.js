@@ -322,7 +322,6 @@ function getChapterDetails(bookId, chapterNum = 1) {
                 chapterContent = chapterContent.concat(temme(html, selector.content) || temme(html, selector.content2));
                 chapterName = temme(html, selector.chapterName) || temme(html, selector.chapterName2) || chapterName;
 
-                console.log('chapterName',chapterName);
                 if(hasNext) {
                     const nextPath = temme(html, selector.nextPath) || temme(html, selector.nextPath2);
                     getDetails(nextPath)

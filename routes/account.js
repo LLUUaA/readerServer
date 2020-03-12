@@ -8,10 +8,15 @@ router.get('/wxLogin', async (ctx, next) => {
 })
 
 router.post('/wxLogin', async (ctx, next) => {
-    let data = {};
-    let { code } = ctx.request.body || {};
-    await wxLogin(code,ctx.request.header["x-real-ip"]||'').then(res => data = res);
-    ctx.body = data;
+    
+    try {
+        const { code } = ctx.request.body || {};
+       const data = await wxLogin(code, ctx.request.header["x-real-ip"] || '');
+       ctx.body = data;
+    } catch (error) {
+        console.log("err",error)
+    }
+
 })
 
 module.exports = router

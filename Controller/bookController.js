@@ -59,9 +59,8 @@ function bookShelf(user_id, datas) {
 
     const findBookShelf = (user_id, book_id, book_info, status) => {
         find('bookshelf', `user_id=${user_id} and book_id=${book_id}`)
-            .then(res => {
+            .then(results => {
                 book_info = 'object' === typeof book_info ? JSON.stringify(book_info) : JSON.stringify({});
-                const { results } = res;
                 let hasBook = false;
                 if (results.length) {
                     hasBook = true;
@@ -82,7 +81,7 @@ function getBookShelf(user_id) {
     return new Promise((resolve,reject)=>{
         find('bookshelf',`user_id=${user_id} and status=1`,'book_info','id desc')
         .then(res=>{
-            resolve(res.results);
+            resolve(res);
         })
         .catch(reject)
     })
@@ -95,8 +94,7 @@ function getBookShelf(user_id) {
  */
 function getLastRead(user_id, book_id) {
     return new Promise((resolve, reject) => {
-        find('history', `user_id=${user_id} AND book_id=${book_id}`, 'chapter_num', 'id DESC', '2').then(res => {
-            const { results } = res;
+        find('history', `user_id=${user_id} AND book_id=${book_id}`, 'chapter_num', 'id DESC', 2).then(results => {
             resolve(results[1]?results[1].chapter_num : null );//why [1],chapter/details  记录的阅读记录，所以每次都会产生最新的一条为第一章。（在没有加入书架时）
         }, err => {
             // console.log('err', err);

@@ -1,3 +1,4 @@
 /node_modules
 /xiashula
 /utils/config.json
+/config/dev.config.js
