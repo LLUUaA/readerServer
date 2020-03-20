@@ -1,22 +1,38 @@
 var Router = require('koa-router');
 var router = new Router();
-const { wxLogin } = require('../Controller/account');
-const { find } = require('../utils/mysql');
+const {
+    wxLogin,
+    deviceLogin
+} = require('../Controller/account');
+const {
+    find
+} = require('../utils/mysql');
 
-router.get('/wxLogin', async (ctx, next) => {
+router.get('/wxLogin', async (ctx) => {
     ctx.body = 'wxLogin'
 })
 
-router.post('/wxLogin', async (ctx, next) => {
-    
-    try {
-        const { code } = ctx.request.body || {};
-       const data = await wxLogin(code, ctx.request.header["x-real-ip"] || '');
-       ctx.body = data;
-    } catch (error) {
-        console.log("err",error)
+router.post('/login', async (ctx) => {
+    const { deviceId } = ctx.request.body;
+    if(!deviceId) {
+        ctx.throw("params error");
     }
+    ctx.body = await deviceLogin(deviceId, ctx.request.header["x-real-ip"] || '');
+})
 
+router.post('/wxLogin', async (ctx, next) => {
+    try {
+        const {
+            code
+        } = ctx.request.body || {};
+        return await wxLogin(code, ctx.request.header["x-real-ip"] || '');
+    } catch (error) {
+        console.log("err", error)
+    }
+})
+
+router.all("*", ctx=> {
+    ctx.body = ctx.request.path || "welcome"
 })
 
 module.exports = router

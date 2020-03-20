@@ -12,7 +12,8 @@ function isCheckAuth(api) {
     const allowList = [
         '/',
         '/book/getConfig',
-        '/account/wxLogin'
+        '/account/wxLogin',
+        '/account/login',
     ];
     return allowList.indexOf(api) >= 0 ? false : true;
 }
@@ -39,6 +40,6 @@ module.exports = async function (ctx, next) {
         })
     }
 
-    await parseSession();
+    // await parseSession();
     await next();
 }

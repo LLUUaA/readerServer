@@ -3,6 +3,7 @@
  */
 
 const logger = require('../lib/logger');
+const querystring = require("querystring");
 
 function isAllowType(contentType) {
     const allowList = [
@@ -27,17 +28,23 @@ module.exports = async function (ctx, next) {
 
                 req.on('end', async () => {
                     // end 
-                    if (!ctx.request.body) ctx.request.body = {};
-                    let parseData = JSON.parse(data.toString());
-                    if(Array.isArray(parseData)) {
-                        // 如果传入的是数组
-                        ctx.request.body = Object.assign(ctx.request.body, {_array:parseData} );
-                    }else {
-                        ctx.request.body = Object.assign(ctx.request.body,parseData );
+                    var parseData;
+                    try {
+                        parseData = JSON.parse(data.toString());
+                    } catch (error) {
+                        parseData = querystring.parse(data);
+                    } finally {
+                        if (!ctx.request.body) ctx.request.body = {};
+
+                        if (Array.isArray(parseData)) {
+                            // 如果传入的是数组
+                            ctx.request.body = Object.assign(ctx.request.body, {
+                                _array: parseData
+                            });
+                        } else {
+                            ctx.request.body = Object.assign(ctx.request.body, parseData);
+                        }
                     }
-
-
-  
                     resolve();
                 })
 
