@@ -10,7 +10,14 @@ function isAllowType(contentType) {
         'application/json',
         'application/x-www-form-urlencoded'
     ];
-    return allowList.indexOf(contentType) >= 0 ? true : false;
+    let chek = false;
+    for (const item of allowList) {
+        if(contentType.indexOf(item) >=0) {
+            let chek = true;
+            break;
+        }
+    }
+    return true;
 }
 
 module.exports = async function (ctx, next) {

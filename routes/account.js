@@ -22,10 +22,8 @@ router.post('/login', async (ctx) => {
 
 router.post('/wxLogin', async (ctx, next) => {
     try {
-        const {
-            code
-        } = ctx.request.body || {};
-        return await wxLogin(code, ctx.request.header["x-real-ip"] || '');
+        const { code } = ctx.request.body || {};
+        ctx.body =  await wxLogin(code, ctx.request.header["x-real-ip"] || '');
     } catch (error) {
         console.log("err", error)
     }

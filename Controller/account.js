@@ -44,6 +44,7 @@ function addUser(userData) {
         register_time: getLocalTime(false),
         login_time: getLocalTime(false),
         login_ip: userData.ip,
+        is_weixin: userData.is_weixin,
         status: 1
     };
     if (userData.openid) {
@@ -74,7 +75,7 @@ function updateUser(userId, ip) {
 async function login(openidOrDeviceId, ip, isOpenid = true) {
     const userInfo = await isExitUser(openidOrDeviceId, isOpenid);
     if (userInfo) {
-        updateUser(userInfo.id2, ip);
+        updateUser(userInfo.id, ip);
         return {
             session: userInfo.access_token
         };
@@ -98,15 +99,16 @@ async function login(openidOrDeviceId, ip, isOpenid = true) {
     };
 }
 
-/**
+/**x
  * @param {string} code 
  * @param {string} ip 
  */
 async function wxLogin(code, ip) {
-    const {
-        openid
-    } = await getWxData(code);
-    return login(openid, ip);
+    const { openid } = await getWxData(code);
+    if(!openid) {
+        throw Error("code Error");
+    }
+    return await login(openid, ip);
 }
 
 /**

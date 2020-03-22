@@ -7,10 +7,6 @@ module.exports = {
         database: "reader",
         connectionLimit: 10
     },
-    dbTables: {
-        record: "loseweight.record",
-        user: "loseweight.wx_user"
-    },
     request: {
         hostname: "localhost",
         port: null,

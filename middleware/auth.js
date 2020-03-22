@@ -23,7 +23,6 @@ module.exports = async function (ctx, next) {
         return new Promise((resolve, reject) => {
             const authorization = ctx.request.header['authorization'];
             const session = authorization ? authorization.split(' ')[1] : '';
-    
             if (!isCheckAuth(ctx.request.url || '')) {
                 return resolve();
             }
@@ -40,6 +39,6 @@ module.exports = async function (ctx, next) {
         })
     }
 
-    // await parseSession();
+    await parseSession();
     await next();
 }

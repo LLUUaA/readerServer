@@ -3,6 +3,7 @@ const config = require("../config/index.config");
 const logger = require('../lib/logger');
 const TYR_TIMES = 2;
 const RELEASE_TIMES = 1000 * 60 * 30; // 30 min
+const UNDEFINED = void(0); // undefined
 let pool = null,
     taskTimer = null, // 任务定时器
     errTimes = 0; // query查询错误次数
@@ -168,10 +169,8 @@ function add(table, datas) {
         data = [];
     if ('object' === typeof datas) {
         for (let key in datas) {
-            // values += `${key},`;
-            // data += `'${datas[key]},'`;
             values.push(key);
-            data.push(`'${datas[key] ||''}'`);
+            data.push(`'${UNDEFINED === datas[key] ? '': datas[key] }'`);
         }
 
         values = values.join(',');
