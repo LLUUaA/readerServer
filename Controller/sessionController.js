@@ -53,7 +53,7 @@ async function checkSession(session) {
     }
 
     return {
-        userId: sessionData.user_id
+        _uid: sessionData.user_id
     }
 }
 

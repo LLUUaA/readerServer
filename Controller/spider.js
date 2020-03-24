@@ -8,7 +8,7 @@ const nodePath = require("path");
 
 /**
  * @function {filterData} 过滤空数据
- * @description 获取book id
+ * @description 获取book id 
  * @returns {Array}
  */
 defineFilter('filterData', function () {
@@ -24,21 +24,21 @@ defineFilter('filterData', function () {
  * @description 获取book id
  * @returns {Int}
  */
-defineFilter('getBookId',function(){
+defineFilter('getBookId', function () {
     const matchStr = '?id=';//pc book id
     const matchStrMobile = '/read_';//mobile book id
     const str = this;
     const oIdx = str.indexOf(matchStr);
     const mIdx = str.indexOf(matchStrMobile);
-    if(oIdx>=0) {
+    if (oIdx >= 0) {
         return parseInt(str.substring(oIdx + matchStr.length));
-    }else if(mIdx>=0){
-        return parseInt(str.substr(1,mIdx));
-    }else{
-        return parseInt(str.replace('/',''));
+    } else if (mIdx >= 0) {
+        return parseInt(str.substr(1, mIdx));
+    } else {
+        return parseInt(str.replace('/', ''));
     }
 
-//    return parseInt(str.substring(oIdx + matchStr.length,str.length));
+    //    return parseInt(str.substring(oIdx + matchStr.length,str.length));
 })
 
 /**
@@ -46,13 +46,13 @@ defineFilter('getBookId',function(){
  * @description 获取章节
  * @returns {Int}
  */
-defineFilter('getChapter',function(){
+defineFilter('getChapter', function () {
     const matchStrMobile = '/read_';
     const str = this;
     const mIdx = str.indexOf(matchStrMobile);
-    if(mIdx>=0){
-        return parseInt(str.substring(mIdx + matchStrMobile.length,str.length-5));
-    }else{
+    if (mIdx >= 0) {
+        return parseInt(str.substring(mIdx + matchStrMobile.length, str.length - 5));
+    } else {
         return 1
     }
 })
@@ -62,14 +62,14 @@ defineFilter('getChapter',function(){
  * @description 获取分类分页
  * @returns {Int}
  */
-function getTypePage(page){
+function getTypePage(page) {
     const matchStrMobile = '_allvisit_';
     const str = page;
     const mIdx = str.indexOf(matchStrMobile);
-    if(mIdx>=0){
-        var pos = parseInt(str.substring(mIdx + matchStrMobile.length,str.length-5)) + 1;
-        return '/type/' + str.substr(0, str.length-6) + pos + str.substring(str.length-5, str.length);
-    }else{
+    if (mIdx >= 0) {
+        var pos = parseInt(str.substring(mIdx + matchStrMobile.length, str.length - 5)) + 1;
+        return '/type/' + str.substr(0, str.length - 6) + pos + str.substring(str.length - 5, str.length);
+    } else {
         return 1
     }
 }
@@ -87,8 +87,8 @@ function getHome() {
         const homeDataPath = nodePath.resolve(__dirname, '../public/data'),
             homeDataName = 'bookHomeData.txt';
 
-        const getData  = function (){
-            return new Promise((resolve,reject)=>{
+        const getData = function () {
+            return new Promise((resolve, reject) => {
                 request({
                     hostname: spider.baseUrl,
                     port: 443
@@ -111,18 +111,18 @@ function getHome() {
                         hotBook = temme(html, selector.todayHot);
                         subMenu = temme(html, selector.subMenu);
                         maleMenu = temme(html, selector.maleMenu);
-                        maleMenu.unshift({href:'/type/nan_0_0_allvisit_1.html',subTxt:'全部'});
-        
+                        maleMenu.unshift({ href: '/type/nan_0_0_allvisit_1.html', subTxt: '全部' });
+
                         femaleMenu = temme(html, selector.femaleMenu);
-                        femaleMenu.unshift({href:'/type/nv_0_0_allvisit_1.html',subTxt:'全部'});
+                        femaleMenu.unshift({ href: '/type/nv_0_0_allvisit_1.html', subTxt: '全部' });
                         const data = { hotBook, subMenu, maleMenu, femaleMenu };
                         resolve(data);
-        
+
                         if (!fs.existsSync(homeDataPath)) {
                             fs.mkdirSync(homeDataPath);
                         }
-                        fs.writeFile(nodePath.resolve(homeDataPath,homeDataName), JSON.stringify(data),err=>{
-                            if(err) logger(err);
+                        fs.writeFile(nodePath.resolve(homeDataPath, homeDataName), JSON.stringify(data), err => {
+                            if (err) logger(err);
                         });
                         // resolve({ hotBook, subMenu });
                     }, err => {
@@ -132,26 +132,30 @@ function getHome() {
             })
         }
 
-        fs.open(nodePath.resolve(homeDataPath,homeDataName), 'r', (err, fd) => {
+        fs.open(nodePath.resolve(homeDataPath, homeDataName), 'r', (err, fd) => {
             if (err) {
-                getData().then(resolve,reject);
+                getData().then(resolve, reject);
                 logger(err);
             } else {
                 const rs = fs.createReadStream('', { fd });
                 rs.on('data', (chunk) => {
-                    if(!chunk || !chunk.length) {
-                        getData().then(resolve,reject);
+                    if (!chunk || !chunk.length) {
+                        getData().then(resolve, reject);
                         return;
                     }
-                    getData();
-                    return resolve(JSON.parse(chunk))
+                    getData(); // update
+                    try {
+                        return resolve(JSON.parse(chunk));
+                    } catch (error) {
+                        getData().then(resolve, reject);
+                    }
                 })
 
                 rs.on('end', function () {
 
                 });
             }
-        }) 
+        })
     })
 }
 
@@ -165,8 +169,12 @@ function getHome() {
  * 
  * @param { keyword, pageIndex,path } keyword关键字 pageIndex页码 path传入页面path
  */
-function search(keyword, pageIndex = 1,path) {
+function search(keyword, pageIndex = 1) {
     return new Promise((resolve, reject) => {
+        if (!keyword) {
+            resolve({ result: [], pager: {} });
+            return;
+        }
         request({
             hostname: spider.baseUrl,
             path: encodeURI(`/search.html?searchkey=${keyword}&searchtype=all&page=${pageIndex}`), //keyword带有中文字符需要encodeURI,不用encodeURIComponent
@@ -202,25 +210,25 @@ function search(keyword, pageIndex = 1,path) {
  * @returns Promise
  */
 
-function getChapter(bookId,onlyChapterInfo = false) {
+function getChapter(bookId, onlyChapterInfo = false) {
     return new Promise((resolve, reject) => {
         request({
             hostname: spider.baseUrl,
             path: `/${bookId}/`,
             port: 443
         }).then(res => {
-            var result = {}, otherNum,bookInfo = {} ; //otherNum 中间隐藏章节数量
+            var result = {}, otherNum, bookInfo = {}; //otherNum 中间隐藏章节数量
             const html = res;
             const selector = {
                 chapterTop: `#main #mainleft #detaillist #toplist li@ {a[href=$chapterNum|getChapter] {$chapterName}; .time{$time}}`,
                 chapterLast: `#main #mainleft #detaillist #lastchapter li@ {a[href=$chapterNum|getChapter] {$chapterName};.time{$time}}`,
                 otherNum: `#main #mainleft #detaillist #hidc .ycnum{$}`,
-                bookIntro:`#main #bookdetail #info #aboutbook{$}`,
-                bookAuthor:`#main #bookdetail #infobox .ainfo .username a{$}`,
-                bookName:`#main #bookdetail #info .infotitle h1{$}`,
-                status:`#main #bookdetail #info .infotitle span{$}`,
-                chapter:`#main .infonum ul@ {li{$}}`,
-                coverImg:`#main #bookdetail #picbox .img_in img[data-original=$];`
+                bookIntro: `#main #bookdetail #info #aboutbook{$}`,
+                bookAuthor: `#main #bookdetail #infobox .ainfo .username a{$}`,
+                bookName: `#main #bookdetail #info .infotitle h1{$}`,
+                status: `#main #bookdetail #info .infotitle span{$}`,
+                chapter: `#main .infonum ul@ {li{$}}`,
+                coverImg: `#main #bookdetail #picbox .img_in img[data-original=$];`
             }
 
             bookInfo.bookIntro = temme(html, selector.bookIntro);
@@ -229,11 +237,11 @@ function getChapter(bookId,onlyChapterInfo = false) {
             bookInfo.status = temme(html, selector.status);
             bookInfo.chapter = temme(html, selector.chapter);
             bookInfo.coverImg = temme(html, selector.coverImg);
-            bookInfo.bookIntro = bookInfo.bookIntro?bookInfo.bookIntro.replace('[+展开]',''):'暂无简介';
+            bookInfo.bookIntro = bookInfo.bookIntro ? bookInfo.bookIntro.replace('[+展开]', '') : '暂无简介';
             bookInfo.bookId = bookId;
 
             if (onlyChapterInfo) {
-                resolve({bookInfo});
+                resolve({ bookInfo });
             } else {
                 result.top = temme(html, selector.chapterTop);
                 result.last = temme(html, selector.chapterLast);
@@ -261,15 +269,15 @@ function getOtherChapter(bookId, pageIndex = 1) {
             path: `/${bookId}/chapters.html?page=${pageIndex}&sort=asc`,// asc | desc
             port: 443
         }).then(res => {
-            var result,chapterPager;
+            var result, chapterPager;
             const html = res;
             const selector = {
-                chapter:`.content .cataloglist li@ {a[href=$chapterNum|getChapter];span{$chapterName}}`,
-                chapterPager:`.content .pagers:first-of-type #select #pagelist option@ {&{$}}`
+                chapter: `.content .cataloglist li@ {a[href=$chapterNum|getChapter];span{$chapterName}}`,
+                chapterPager: `.content .pagers:first-of-type #select #pagelist option@ {&{$}}`
             }
             result = temme(html, selector.chapter);
             chapterPager = temme(html, selector.chapterPager);
-            resolve({chapterList:result,chapterPager,pageIndex,bookId});
+            resolve({ chapterList: result, chapterPager, pageIndex, bookId });
         }, err => {
             reject(err)
         })
@@ -316,21 +324,29 @@ function getChapterDetails(bookId, chapterNum = 1) {
                     chapterName2: `#content .titlename{$}`,
                     nextPage: `.content .articlebtn .nextinfo{$}`,
                     nextPage2: `#content .articlebtn .nextinfo{$}`,
-                    nextPath:`.content .articlebtn .nextinfo[href=$];`,
-                    nextPath2:`#content .articlebtn .nextinfo[href=$];`
+                    nextPath: `.content .articlebtn .nextinfo[href=$];`,
+                    nextPath2: `#content .articlebtn .nextinfo[href=$];`
                 };
                 const hasNext = temme(html, selector.nextPage) === '下一页' || temme(html, selector.nextPage2) === '下一页' || false;
                 chapterContent = chapterContent.concat(temme(html, selector.content) || temme(html, selector.content2));
                 chapterName = temme(html, selector.chapterName) || temme(html, selector.chapterName2) || chapterName;
 
-                if(hasNext) {
+                // replace "↵"
+                for (const i in chapterContent) {
+                    const str = chapterContent[i];
+                    const lastStr = str.slice(-1);
+                    if (lastStr && 10 === lastStr.charCodeAt()) {
+                        chapterContent[i] = str.substr(0, str.length - 1);
+                    }
+                }
+
+                if (hasNext) {
                     const nextPath = temme(html, selector.nextPath) || temme(html, selector.nextPath2);
                     getDetails(nextPath)
-                }else {
+                } else {
                     resolve({ chapterName, chapterContent });
                 }
-                // resolve({ chapterName, chapterContent });
-            },err=>{
+            }, err => {
                 logger(err);
                 reject(err);
             });
@@ -362,7 +378,7 @@ function getBookType(type) {
                 nextPage = getTypePage(type);
             total = temme(html, selector.total);
             resolve({ bookList, total, nextPage });
-        },reject)
+        }, reject)
     })
 }
 
@@ -381,7 +397,7 @@ function getAuthorBook(author) {
             const selector = {
                 book: `.content .module #ulist li@ {a[href=$bookId|getBookId];img[data-original=$coverImg];p.intro{$description};p.book_title{$name}}`
             },
-            bookList = temme(html, selector.book);
+                bookList = temme(html, selector.book);
             resolve(bookList);
         }, reject)
     })

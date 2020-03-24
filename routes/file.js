@@ -3,14 +3,15 @@ var router = new Router();
 const { generateToken } = require('../utils/common');
 const fileUpload = require('../lib/upload/fileUpload');
 const iconv = require('iconv-lite');
+const fs = require("fs");
 
 router.get('/', async (ctx, next) => {
-    const fs = require("fs");
     // const path = process.cwd() + '/upload/README.md';
     const path = 'upload/README.md';
     var result;
     var datas = [];
     var size = 0;
+
     const getContent = () => {
         return new Promise((resolve,reject)=>{
             fs.open(path, 'r', (err, fd) => {
@@ -20,7 +21,7 @@ router.get('/', async (ctx, next) => {
                     datas.push(oData);  
                     size += oData.length;  
                 })
-                rstrem.on('end', (data) => {
+                rstrem.on('end', () => {
                     console.log('end');
                     var buff = Buffer.concat(datas, size);  
                     var result = iconv.decode(buff, "utf8");
@@ -29,10 +30,9 @@ router.get('/', async (ctx, next) => {
             })
         })
     }
+    // getContent();
 
-    await getContent().then(res => result = res);
-
-    ctx.body = result || 'file route';
+    ctx.body =  'file route';
 })
 
 /**
