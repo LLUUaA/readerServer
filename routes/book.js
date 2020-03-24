@@ -128,9 +128,9 @@ router.post('/bookshelf', (ctx, next) => {
  * @datatime 2020年3月24日
  * @description 手机app api
  */
-router.post('/bookshelf/add', (ctx, next) => {
+router.post('/bookshelf/add', async (ctx, next) => {
     const { _uid, bookId, bookInfo } = ctx.request.body;
-    addBookShelf(_uid, bookId, bookInfo);
+    await addBookShelf(_uid, bookId, bookInfo);
     ctx.status = 204;
 });
 
@@ -139,9 +139,9 @@ router.post('/bookshelf/add', (ctx, next) => {
  * @datatime 2020年3月24日
  * @description 手机app api
  */
-router.post('/bookshelf/remove', (ctx, next) => {
+router.post('/bookshelf/remove', async (ctx, next) => {
     const { _uid, bookId } = ctx.request.body;
-    removeBookShelf(_uid, bookId);
+    await removeBookShelf(_uid, bookId);
     ctx.status = 204;
 });
 
