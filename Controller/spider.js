@@ -25,20 +25,10 @@ defineFilter('filterData', function () {
  * @returns {Int}
  */
 defineFilter('getBookId', function () {
-    const matchStr = '?id=';//pc book id
-    const matchStrMobile = '/read_';//mobile book id
-    const str = this;
-    const oIdx = str.indexOf(matchStr);
-    const mIdx = str.indexOf(matchStrMobile);
-    if (oIdx >= 0) {
-        return parseInt(str.substring(oIdx + matchStr.length));
-    } else if (mIdx >= 0) {
-        return parseInt(str.substr(1, mIdx));
-    } else {
-        return parseInt(str.replace('/', ''));
-    }
-
-    //    return parseInt(str.substring(oIdx + matchStr.length,str.length));
+    const p = /\d+/;//mobile book id
+    let [id] = p.exec(this);
+    id = parseInt(id);
+    return id;
 })
 
 /**
